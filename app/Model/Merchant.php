@@ -23,7 +23,7 @@ class Merchant extends Model implements Authenticatable
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'merchant';
+    protected ?string $table = 'md_merchant';
 
     /**
      * The attributes that are mass assignable.

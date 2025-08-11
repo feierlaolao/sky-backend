@@ -31,10 +31,9 @@ class AppExceptionHandler extends ExceptionHandler
         $this->stopPropagation();
         $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         $this->logger->error($throwable->getTraceAsString());
+        $body = MyResponse::error('系统错误',500)->json();
 
-        $body = MyResponse::getInstance(success: false,errorMessage: '系统错误')->json();
-
-        return $response->withStatus(200)->withBody(new SwooleStream($body));
+        return $response->withStatus(500)->withBody(new SwooleStream($body));
     }
 
     public function isValid(Throwable $throwable): bool

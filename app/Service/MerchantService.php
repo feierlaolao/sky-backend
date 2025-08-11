@@ -15,7 +15,7 @@ class MerchantService
         if ($merchant == null) {
             throw new ServiceException('用户名/密码错误');
         }
-        if ($merchant->password != sha1($password)) {
+        if ($merchant->password != md5($password)) {
             throw new ServiceException('用户名/密码错误');
         }
         return $merchant;

@@ -26,10 +26,12 @@ class ValidationExceptionHandler extends ExceptionHandler
         $this->stopPropagation();
         /** @var ValidationException $throwable */
         $body = $throwable->validator->errors()->first();
-        if (! $response->hasHeader('content-type')) {
+        if (!$response->hasHeader('content-type')) {
             $response = $response->addHeader('content-type', 'application/json; charset=utf-8');
         }
-        return $response->setStatus(200)->setBody(new SwooleStream(MyResponse::getInstance(success: false, errorMessage: $body)->json()));
+        return $response->setStatus(200)->setBody(new SwooleStream(
+            MyResponse::error($body, 500)->json()
+        ));
     }
 
     public function isValid(Throwable $throwable): bool

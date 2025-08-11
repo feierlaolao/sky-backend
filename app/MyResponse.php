@@ -2,194 +2,81 @@
 
 namespace App;
 
+use Hyperf\Contract\LengthAwarePaginatorInterface;
+
 class MyResponse
 {
 
     private function __construct(
-        private bool $success,
-        private $data,
-        private string|null $errorMessage,
-        private int|null $errorCode,
-        private int|null $pageSize,
-        private int|null $current,
-        private int|null $total
-    ) {}
-
-    public static function getInstance(bool $success = true, $data = null, string|null $errorMessage = null, int|null $errorCode = null, int|null $pageSize = null, int|null $current = null, int|null $total = null)
+        private readonly bool    $success,
+        private readonly mixed   $data = null,
+        private readonly ?string $errorMessage = null,
+        private readonly ?int    $errorCode = null,
+        private readonly ?int    $pageSize = null,
+        private readonly ?int    $current = null,
+        private readonly ?int    $total = null
+    )
     {
-        return new MyResponse($success, $data,  $errorMessage,  $errorCode,  $pageSize,  $current,  $total);
     }
 
-    public function build()
+    public static function success(mixed $data = null): MyResponse
     {
-        $temp = [
-            'success' => $this->isSuccess()
-        ];
-        if (!$this->isSuccess()) {
-            if ($this->getErrorMessage() != null) {
-                $temp['errorMessage'] = $this->getErrorMessage();
-            }
+        return new self(true, $data);
+    }
 
-            if ($this->getErrorCode() != null) {
-                $temp['errorCode'] = $this->getErrorCode();
+    public static function error(string $errorMessage, ?int $errorCode = null): MyResponse
+    {
+        return new self(false, errorMessage: $errorMessage, errorCode: $errorCode);
+    }
+
+    public static function page(iterable $data, int $current, int $pageSize, int $total): MyResponse
+    {
+        return new self(true, data: $data, pageSize: $pageSize, current: $current, total: $total);
+    }
+
+
+    public static function formPaginator(LengthAwarePaginatorInterface $paginator): MyResponse
+    {
+        return self::page($paginator->items(), $paginator->currentPage(), $paginator->perPage(), $paginator->total());
+    }
+
+    public function toArray(): array
+    {
+        $base = ['success' => $this->success];
+
+        if ($this->success) {
+            if ($this->data !== null) {
+                $base['data'] = $this->data;
             }
+            // 分页信息仅在成功时输出
+            $base += array_filter([
+                'current' => $this->current,
+                'pageSize' => $this->pageSize,
+                'total' => $this->total,
+            ], static fn($v) => $v !== null);
         } else {
-            if ($this->getData() != null) {
-                $temp['data'] = $this->getData();
-            }else{
-                
-            }
-        }
-        return $temp;
-    }
-
-    public function list()
-    {
-        $temp = $this->build();
-        if ($this->getCurrent() != null) {
-            $temp['current'] = $this->getCurrent();
+            $base += array_filter([
+                'errorMessage' => $this->errorMessage,
+                'errorCode' => $this->errorCode,
+            ], static fn($v) => $v !== null);
         }
 
-        if ($this->getPageSize() != null) {
-            $temp['pageSize'] = $this->getPageSize();
+        if (!empty($this->extra)) {
+            // 合并额外字段；如与内置键冲突，会被 extra 覆盖
+            $base = array_merge($base, $this->extra);
         }
 
-        if ($this->getTotal() != null) {
-            $temp['total'] = $this->getTotal();
-        }
-        return $temp;
+        return $base;
     }
 
-
-    public function json()
+    public function jsonSerialize(): array
     {
-        return json_encode($this->build());
+        return $this->toArray();
     }
 
-
-    /**
-     * Get the value of success
-     */
-    public function isSuccess(): bool
+    public function json(int $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES): string
     {
-        return $this->success;
+        return json_encode($this->toArray(), $flags);
     }
 
-    /**
-     * Set the value of success
-     */
-    public function setSuccess(bool $success): self
-    {
-        $this->success = $success;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of data
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Set the value of data
-     */
-    public function setData($data): self
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of errorMessage
-     */
-    public function getErrorMessage(): ?string
-    {
-        return $this->errorMessage;
-    }
-
-    /**
-     * Set the value of errorMessage
-     */
-    public function setErrorMessage(?string $errorMessage): self
-    {
-        $this->errorMessage = $errorMessage;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of errorCode
-     */
-    public function getErrorCode(): ?int
-    {
-        return $this->errorCode;
-    }
-
-    /**
-     * Set the value of errorCode
-     */
-    public function setErrorCode(?int $errorCode): self
-    {
-        $this->errorCode = $errorCode;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of pageSize
-     */
-    public function getPageSize(): ?int
-    {
-        return $this->pageSize;
-    }
-
-    /**
-     * Set the value of pageSize
-     */
-    public function setPageSize(?int $pageSize): self
-    {
-        $this->pageSize = $pageSize;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of current
-     */
-    public function getCurrent(): ?int
-    {
-        return $this->current;
-    }
-
-    /**
-     * Set the value of current
-     */
-    public function setCurrent(?int $current): self
-    {
-        $this->current = $current;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of total
-     */
-    public function getTotal(): ?int
-    {
-        return $this->total;
-    }
-
-    /**
-     * Set the value of total
-     */
-    public function setTotal(?int $total): self
-    {
-        $this->total = $total;
-
-        return $this;
-    }
 }

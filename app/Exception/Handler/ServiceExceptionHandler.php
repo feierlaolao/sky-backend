@@ -16,10 +16,9 @@ class ServiceExceptionHandler extends ExceptionHandler
     {
         $this->stopPropagation();
         return $response
-            ->withStatus(200)
+            ->withStatus(500)
             ->withBody(new SwooleStream(
-                MyResponse::getInstance(success: false, errorMessage: $throwable->getMessage(), errorCode: 500)
-                    ->json()
+                MyResponse::error($throwable->getMessage(), 500)->json()
             ));
     }
 
