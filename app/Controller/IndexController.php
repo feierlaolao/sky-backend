@@ -20,7 +20,6 @@ use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\PostMapping;
-use Hyperf\HttpServer\Annotation\RequestMapping;
 use Qbhy\HyperfAuth\AuthManager;
 
 #[Controller('index')]
@@ -47,18 +46,4 @@ class IndexController extends AbstractController
             'token' => $token
         ])->toArray();
     }
-
-
-    #[RequestMapping('test')]
-    public function Test()
-    {
-        $sku = new InvItemSku();
-        $sku->spu_id = '812835307215925249';
-        $sku->name = '1箱';
-        $sku->barcode = '123456789';
-        $sku->conversion_to_base = 15;
-        $sku->price = 10;
-        $sku->save();
-    }
-
 }
