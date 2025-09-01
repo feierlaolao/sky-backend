@@ -15,6 +15,7 @@ class ServiceExceptionHandler extends ExceptionHandler
     public function handle(Throwable $throwable, ResponsePlusInterface $response): ResponsePlusInterface
     {
         $this->stopPropagation();
+        $response = $response->setHeader('content-type', 'application/json; charset=utf-8');
         return $response
             ->withStatus(500)
             ->withBody(new SwooleStream(

@@ -24,6 +24,7 @@ class AuthExceptionHandler extends ExceptionHandler
     public function handle(Throwable $throwable, ResponsePlusInterface $response)
     {
         $this->stopPropagation();
+        $response = $response->setHeader('content-type', 'application/json; charset=utf-8');
         return $response
             ->withStatus(401)
             ->withBody(new SwooleStream(

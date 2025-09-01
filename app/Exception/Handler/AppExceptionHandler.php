@@ -31,6 +31,7 @@ class AppExceptionHandler extends ExceptionHandler
         $this->stopPropagation();
         $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         $this->logger->error($throwable->getTraceAsString());
+        $response = $response->setHeader('content-type', 'application/json; charset=utf-8');
         $body = MyResponse::error('系统错误',500)->json();
 
         return $response->withStatus(500)->withBody(new SwooleStream($body));
