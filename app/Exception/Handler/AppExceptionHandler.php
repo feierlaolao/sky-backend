@@ -34,7 +34,7 @@ class AppExceptionHandler extends ExceptionHandler
         $response = $response->setHeader('content-type', 'application/json; charset=utf-8');
         $body = MyResponse::error('系统错误',500)->json();
 
-        return $response->withStatus(500)->withBody(new SwooleStream($body));
+        return $response->withStatus(200)->withBody(new SwooleStream($body));
     }
 
     public function isValid(Throwable $throwable): bool

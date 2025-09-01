@@ -26,7 +26,7 @@ class AuthExceptionHandler extends ExceptionHandler
         $this->stopPropagation();
         $response = $response->setHeader('content-type', 'application/json; charset=utf-8');
         return $response
-            ->withStatus(401)
+            ->withStatus(200)
             ->withBody(new SwooleStream(
                 MyResponse::error('验证失败',401)->json()
             ));

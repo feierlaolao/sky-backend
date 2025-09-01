@@ -17,7 +17,7 @@ class ServiceExceptionHandler extends ExceptionHandler
         $this->stopPropagation();
         $response = $response->setHeader('content-type', 'application/json; charset=utf-8');
         return $response
-            ->withStatus(500)
+            ->withStatus(200)
             ->withBody(new SwooleStream(
                 MyResponse::error($throwable->getMessage(), 500)->json()
             ));
