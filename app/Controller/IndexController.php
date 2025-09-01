@@ -40,8 +40,10 @@ class IndexController extends AbstractController
             if ($merchant == null) {
                 throw new ServiceException('商户不存在');
             }
+            $token = $this->authManager->guard('merchant_jwt')->login($user);
+        } else {
+            $token = $this->authManager->login($user);
         }
-        $token = $this->authManager->login($user);
         return MyResponse::success([
             'token' => $token
         ])->toArray();
