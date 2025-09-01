@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-
-
-use Hyperf\Database\Model\SoftDeletes;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
@@ -19,7 +16,6 @@ use Hyperf\Snowflake\Concern\Snowflake;
 class InvCategory extends Model
 {
     use Snowflake;
-    use SoftDeletes;
     /**
      * The table associated with the model.
      */
