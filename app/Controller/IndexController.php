@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Exception\ServiceException;
-use App\Model\InvItemSku;
 use App\MyResponse;
 use App\Request\LoginRequest;
 use App\Service\UserService;
