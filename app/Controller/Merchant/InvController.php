@@ -204,6 +204,7 @@ class InvController extends AbstractController
         $data = $request->validatedWithMerchant();
         $this->itemService->addItem($data);
         return MyResponse::success()->toArray();
+
     }
 
 }
