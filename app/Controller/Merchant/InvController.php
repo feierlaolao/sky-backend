@@ -58,7 +58,7 @@ class InvController extends AbstractController
     #[PostMapping('categories')]
     public function addCategory(InvCategoryRequest $request): array
     {
-        $data = $request->scene('add')->validated();
+        $data = $request->validatedWithMerchant();
         $this->categoryService->addCategory($data);
         return MyResponse::success()->toArray();
     }

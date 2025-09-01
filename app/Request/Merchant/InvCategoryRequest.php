@@ -8,6 +8,7 @@ use Hyperf\Validation\Request\FormRequest;
 
 class InvCategoryRequest extends FormRequest
 {
+    use BaseMerchant;
     protected array $scenes = [
         'add' => ['name'],
         'update' => ['name'],
