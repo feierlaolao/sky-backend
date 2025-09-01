@@ -23,7 +23,8 @@ class LoginRequest extends FormRequest
     {
         return [
             'username' => 'required',
-            'password' => 'required'
+            'password' => 'required',
+            'type' => 'required|in:user,merchant',
         ];
     }
 
@@ -32,6 +33,8 @@ class LoginRequest extends FormRequest
         return [
             'username.required' => '用户名不能为空',
             'password.required' => '密码不能为空',
+            'type.required' => '登陆类型不能为空',
+            'type.in' => '登陆类型不存在',
         ];
     }
 }

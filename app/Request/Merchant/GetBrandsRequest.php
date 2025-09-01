@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Request;
+namespace App\Request\Merchant;
 
 
-class ItemsRequest extends PaginatedFormRequest
+use App\Request\PaginatedFormRequest;
+
+class GetBrandsRequest extends PaginatedFormRequest
 {
+    use BaseMerchant;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,8 +24,8 @@ class ItemsRequest extends PaginatedFormRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            'name' => '',
-            'sortBy' => '',
+            'name' => 'string|max:64',
+            'sortBy' => 'in:created_at',
         ]);
     }
 
@@ -30,7 +33,12 @@ class ItemsRequest extends PaginatedFormRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-
+            'name.string' => '品牌名称不正确',
+            'name.max' => '品牌名称不能大于64个字符',
+            'sortBy.in' => '排序字段不正确',
         ]);
     }
+
+
+
 }

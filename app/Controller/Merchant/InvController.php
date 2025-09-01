@@ -1,0 +1,209 @@
+<?php
+
+namespace App\Controller\Merchant;
+
+use App\Controller\AbstractController;
+use App\Exception\ServiceException;
+use App\Middleware\MerchantAuthMiddleware;
+use App\MyResponse;
+use App\Request\Merchant\GetBrandsRequest;
+use App\Request\Merchant\GetCategoriesRequest;
+use App\Request\Merchant\GetChannelsRequest;
+use App\Request\Merchant\GetItemsRequest;
+use App\Request\Merchant\InvBrandRequest;
+use App\Request\Merchant\InvCategoryRequest;
+use App\Request\Merchant\InvChannelRequest;
+use App\Request\Merchant\ItemsRequest;
+use App\Service\Inv\BrandService;
+use App\Service\Inv\CategoryService;
+use App\Service\Inv\ChannelService;
+use App\Service\ItemService;
+use Hyperf\Di\Annotation\Inject;
+use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\DeleteMapping;
+use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\Middleware;
+use Hyperf\HttpServer\Annotation\PatchMapping;
+use Hyperf\HttpServer\Annotation\PostMapping;
+use Qbhy\HyperfAuth\AuthManager;
+
+#[Controller('merchant/inv')]
+#[Middleware(MerchantAuthMiddleware::class)]
+class InvController extends AbstractController
+{
+
+    #[Inject]
+    protected CategoryService $categoryService;
+
+    #[Inject]
+    protected BrandService $brandService;
+
+    #[Inject]
+    protected ChannelService $channelService;
+
+    #[Inject]
+    protected AuthManager $authManager;
+
+    #[Inject]
+    protected ItemService $itemService;
+
+    #[GetMapping('categories')]
+    public function getCategories(GetCategoriesRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $res = $this->categoryService->getCategoryList($data);
+        return MyResponse::formPaginator($res)->toArray();
+    }
+
+    #[PostMapping('categories')]
+    public function addCategory(InvCategoryRequest $request): array
+    {
+        $data = $request->scene('add')->validated();
+        $this->categoryService->addCategory($data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[GetMapping('categories/{id}')]
+    public function getCategory($id): array
+    {
+        $category = $this->categoryService->getCategoryByMerchantIdAndId($this->authManager->id(), $id);
+        return MyResponse::success($category)->toArray();
+    }
+
+    #[PatchMapping('categories/{id}')]
+    public function editCategory($id, InvCategoryRequest $request): array
+    {
+        $data = $request->scene('update')->validated();
+        if ($this->categoryService->getCategoryByMerchantIdAndId($this->authManager->id(), $id) == null) {
+            throw new ServiceException('分类不存在');
+        }
+        $this->categoryService->updateCategory($id, $data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[DeleteMapping('categories/{id}')]
+    public function deleteCategory($id): array
+    {
+        if ($this->categoryService->getCategoryByMerchantIdAndId($this->authManager->id(), $id)) {
+            throw new ServiceException('分类不存在');
+        }
+        $this->categoryService->deleteCategory($id);
+        return MyResponse::success()->toArray();
+    }
+
+
+    #[GetMapping('brands')]
+    public function getBrands(GetBrandsRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $res = $this->brandService->getBrandList($data);
+        return MyResponse::formPaginator($res)->toArray();
+    }
+
+
+    #[PostMapping('brands')]
+    public function addBrand(InvBrandRequest $request): array
+    {
+        $data = $request->scene('add')->validated();
+        $this->brandService->addBrand($data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[GetMapping('brands/{id}')]
+    public function getBrand($id): array
+    {
+        $brand = $this->brandService->getBrandByMerchantIdAndId($this->authManager->id(), $id);
+        return MyResponse::success($brand)->toArray();
+    }
+
+    #[PatchMapping('brands/{id}')]
+    public function editBrand($id, InvCategoryRequest $request): array
+    {
+        $data = $request->scene('update')->validated();
+        if ($this->brandService->getBrandByMerchantIdAndId($this->authManager->id(), $id) == null) {
+            throw new ServiceException('分类不存在');
+        }
+        $this->brandService->updateBrand($id, $data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[DeleteMapping('brands/{id}')]
+    public function deleteBrand($id): array
+    {
+        if ($this->brandService->getBrandByMerchantIdAndId($this->authManager->id(), $id)) {
+            throw new ServiceException('分类不存在');
+        }
+        $this->brandService->deleteBrand($id);
+        return MyResponse::success()->toArray();
+    }
+
+
+    #[GetMapping('channels')]
+    public function getChannels(GetChannelsRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $res = $this->channelService->getChannelList($data);
+        return MyResponse::formPaginator($res)->toArray();
+    }
+
+
+    #[PostMapping('channels')]
+    public function addChannel(InvBrandRequest $request): array
+    {
+        $data = $request->validated();
+        $this->channelService->addChannel($data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[GetMapping('channels/{id}')]
+    public function getChannel($id): array
+    {
+        $channel = $this->channelService->getChannelByMerchantIdAndId($this->authManager->id(), $id);
+        return MyResponse::success($channel)->toArray();
+    }
+
+    #[PatchMapping('channels/{id}')]
+    public function editChannel($id, InvChannelRequest $request): array
+    {
+        $data = $request->validated();
+        if ($this->channelService->getChannelByMerchantIdAndId($this->authManager->id(), $id) == null) {
+            throw new ServiceException('分类不存在');
+        }
+        $this->channelService->updateChannel($id, $data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[DeleteMapping('channels/{id}')]
+    public function deleteChannels($id): array
+    {
+        if ($this->channelService->getChannelByMerchantIdAndId($this->authManager->id(), $id)) {
+            throw new ServiceException('分类不存在');
+        }
+        $this->channelService->deleteChannel($id);
+        return MyResponse::success()->toArray();
+    }
+
+
+    #[GetMapping('items')]
+    public function getItems(GetItemsRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        return MyResponse::formPaginator($this->itemService->items($data))->toArray();
+    }
+
+    #[GetMapping('items/{id}')]
+    public function getItem($id): array
+    {
+        $data = $this->itemService->getItemByMerchantIdAndId($this->authManager->id(), $id);
+        return MyResponse::success($data)->toArray();
+    }
+
+    #[PostMapping('items')]
+    public function addItem(ItemsRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $this->itemService->addItem($data);
+        return MyResponse::success()->toArray();
+    }
+
+}

@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\MyResponse;
 use App\Request\FileUploadRequest;
+use App\Service\FileService;
 use Aws\S3\S3Client;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\PostMapping;
+use Hyperf\HttpServer\Annotation\GetMapping;
 use League\Flysystem\Filesystem;
 use function Hyperf\Support\env;
 
@@ -17,11 +19,20 @@ class FileController
     #[Inject]
     protected Filesystem $filesystem;
 
-    #[PostMapping('upload')]
+    #[Inject]
+    protected FileService $fileService;
+
+    #[GetMapping('upload')]
     public function upload(FileUploadRequest $request)
     {
         $data = $request->validated();
-        $key = 'uploads/' . uniqid('', true) . '.' . $data['extension'];
+        $key = 'uploads/' . md5(uniqid('', true)) . '.' . $data['extension'];
+        $bucket = env('S3_BUCKET');
+        $fileAttachment = $this->fileService->addFile([
+            'bucket' => $bucket,
+            'upload_user_id' => '',
+            'object_key' => $key,
+        ]);
         //获得s3的鉴权url
         $config = [
             'version' => 'latest',
@@ -31,9 +42,10 @@ class FileController
             ],
             'region' => env('S3_REGION'),
             'endpoint' => env('S3_ENDPOINT'),
-            'use_path_style_endpoint' => true,
+            'use_path_style_endpoint' => false,
+            'bucket_endpoint' => true,
         ];
-        $bucket = env('S3_BUCKET');
+
         $s3Client = new S3Client($config);
 
         $cmd = $s3Client->getCommand('PutObject', [
@@ -41,7 +53,11 @@ class FileController
             'Key' => $key,
         ]);
         $request = $s3Client->createPresignedRequest($cmd, '+10 minutes');
-        return $request->getUri();
+        return MyResponse::success([
+            'id' => (string)$fileAttachment->id,
+            'object_url' => env('S3_ENDPOINT').'/'.$key,
+            'upload_url' => $request->getUri(),
+        ])->toArray();
     }
 
 }

@@ -13,8 +13,8 @@ use Hyperf\Snowflake\Concern\Snowflake;
  * @property string $spu_id 
  * @property string $name 
  * @property string $barcode 
+ * @property string $base_sku_id 
  * @property int $conversion_to_base 
- * @property string $price 
  * @property string $attrs 
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
@@ -30,7 +30,7 @@ class InvItemSku extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'spu_id', 'name', 'barcode', 'conversion_to_base', 'price', 'attrs', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'spu_id', 'name', 'barcode', 'base_sku_id', 'conversion_to_base', 'attrs', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.
