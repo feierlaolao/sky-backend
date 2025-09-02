@@ -6,6 +6,8 @@ namespace App\Model;
 
 
 
+use Hyperf\Snowflake\Concern\Snowflake;
+
 /**
  * @property string $id 
  * @property string $merchant_id 
@@ -16,6 +18,7 @@ namespace App\Model;
  */
 class InvChannel extends Model
 {
+    use Snowflake;
     /**
      * The table associated with the model.
      */

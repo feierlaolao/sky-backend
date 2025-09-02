@@ -7,6 +7,7 @@ namespace App\Model;
 
 use Hyperf\Database\Model\Relations\BelongsTo;
 use Hyperf\Database\Model\Relations\HasMany;
+use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
  * @property string $id 
@@ -22,6 +23,7 @@ use Hyperf\Database\Model\Relations\HasMany;
  */
 class InvItemSpu extends Model
 {
+    use Snowflake;
     /**
      * The table associated with the model.
      */
