@@ -104,7 +104,7 @@ class InvController extends AbstractController
     #[PostMapping('brands')]
     public function addBrand(InvBrandRequest $request): array
     {
-        $data = $request->scene('add')->validated();
+        $data = $request->validatedWithMerchant();
         $this->brandService->addBrand($data);
         return MyResponse::success()->toArray();
     }

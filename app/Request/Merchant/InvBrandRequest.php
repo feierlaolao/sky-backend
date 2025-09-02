@@ -8,6 +8,7 @@ use Hyperf\Validation\Request\FormRequest;
 
 class InvBrandRequest extends FormRequest
 {
+    use BaseMerchant;
     protected array $scenes = [
         'add' => ['name'],
         'update' => ['name'],
