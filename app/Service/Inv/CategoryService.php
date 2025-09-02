@@ -33,7 +33,9 @@ class CategoryService
 
     public function getCategoryByMerchantIdAndId(string $merchant_id, string $id): ?InvCategory
     {
-        return InvCategory::where('id', $id)->where('merchant_id', $merchant_id)->first();
+        return InvCategory::where('id', $id)
+            ->where('merchant_id', $merchant_id)
+            ->first();
     }
 
     public function updateCategory($id, $data)

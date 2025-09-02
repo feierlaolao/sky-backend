@@ -84,7 +84,7 @@ class InvController extends AbstractController
     #[DeleteMapping('categories/{id}')]
     public function deleteCategory($id): array
     {
-        if ($this->categoryService->getCategoryByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id)) {
+        if (!$this->categoryService->getCategoryByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id)) {
             throw new ServiceException('分类不存在');
         }
         $this->categoryService->deleteCategory($id);
