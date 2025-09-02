@@ -148,7 +148,7 @@ class InvController extends AbstractController
 
 
     #[PostMapping('channels')]
-    public function addChannel(InvBrandRequest $request): array
+    public function addChannel(InvChannelRequest $request): array
     {
         $data = $request->validatedWithMerchant();
         $this->channelService->addChannel($data);
