@@ -73,7 +73,7 @@ class InvController extends AbstractController
     #[PatchMapping('categories/{id}')]
     public function editCategory($id, InvCategoryRequest $request): array
     {
-        $data = $request->scene('update')->validated();
+        $data = $request->validatedWithMerchant();
         if ($this->categoryService->getCategoryByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id) == null) {
             throw new ServiceException('分类不存在');
         }
@@ -119,7 +119,7 @@ class InvController extends AbstractController
     #[PatchMapping('brands/{id}')]
     public function editBrand($id, InvCategoryRequest $request): array
     {
-        $data = $request->scene('update')->validated();
+        $data = $request->validatedWithMerchant();
         if ($this->brandService->getBrandByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id) == null) {
             throw new ServiceException('分类不存在');
         }
@@ -130,7 +130,7 @@ class InvController extends AbstractController
     #[DeleteMapping('brands/{id}')]
     public function deleteBrand($id): array
     {
-        if ($this->brandService->getBrandByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id)) {
+        if (!$this->brandService->getBrandByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id)) {
             throw new ServiceException('分类不存在');
         }
         $this->brandService->deleteBrand($id);
@@ -150,7 +150,7 @@ class InvController extends AbstractController
     #[PostMapping('channels')]
     public function addChannel(InvBrandRequest $request): array
     {
-        $data = $request->validated();
+        $data = $request->validatedWithMerchant();
         $this->channelService->addChannel($data);
         return MyResponse::success()->toArray();
     }
@@ -165,7 +165,7 @@ class InvController extends AbstractController
     #[PatchMapping('channels/{id}')]
     public function editChannel($id, InvChannelRequest $request): array
     {
-        $data = $request->validated();
+        $data = $request->validatedWithMerchant();
         if ($this->channelService->getChannelByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id) == null) {
             throw new ServiceException('分类不存在');
         }
@@ -176,7 +176,7 @@ class InvController extends AbstractController
     #[DeleteMapping('channels/{id}')]
     public function deleteChannels($id): array
     {
-        if ($this->channelService->getChannelByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id)) {
+        if (!$this->channelService->getChannelByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id)) {
             throw new ServiceException('分类不存在');
         }
         $this->channelService->deleteChannel($id);
