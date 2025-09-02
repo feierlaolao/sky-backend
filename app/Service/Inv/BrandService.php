@@ -31,7 +31,7 @@ class BrandService
         return $brand;
     }
 
-    public function getBrandByMerchantIdAndId(string $merchant_id, string $id): InvBrand
+    public function getBrandByMerchantIdAndId(string $merchant_id, string $id): ?InvBrand
     {
         return InvBrand::where('id', $id)->where('merchant_id', $merchant_id)->first();
     }
