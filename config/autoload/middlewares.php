@@ -15,6 +15,7 @@ use App\Middleware\CorsMiddleware;
 return [
     'http' => [
         CorsMiddleware::class,
+        \Qbhy\HyperfAuth\AuthMiddleware::class,
         \Hyperf\Validation\Middleware\ValidationMiddleware::class
     ],
 ];
