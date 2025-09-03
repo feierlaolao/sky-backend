@@ -41,7 +41,7 @@ class ItemService
                 throw new ServiceException('分类不存在');
             }
             //查询brand_id是否合法
-            if (!InvBrand::where('merchant_id', $data['merchant_id'])->where('id', $data['brand_id'])->exists()) {
+            if (isset($data['brand_id']) && !InvBrand::where('merchant_id', $data['merchant_id'])->where('id', $data['brand_id'])->exists()) {
                 throw new ServiceException('品牌不存在');
             }
             $imageIds = array_values(array_unique($data['images'] ?? []));
@@ -70,7 +70,7 @@ class ItemService
             $spu = new InvItemSpu();
             $spu->merchant_id = $data['merchant_id'];
             $spu->category_id = $data['category_id'];
-            $spu->brand_id = $data['brand_id'];
+            $spu->brand_id = $data['brand_id'] ?? null;
             $spu->name = $data['name'];
             $spu->save();
             $spu->sku()->saveMany($skus);
