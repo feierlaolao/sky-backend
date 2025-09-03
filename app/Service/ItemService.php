@@ -11,6 +11,7 @@ use App\Model\InvItemSpu;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Db;
+use function Symfony\Component\Translation\t;
 
 class ItemService
 {
@@ -36,6 +37,10 @@ class ItemService
     public function addItem($data)
     {
         return Db::transaction(function () use ($data) {
+            //查询产品名称是否被占用
+            if (InvItemSpu::where('merchant_id', $data['merchant_id'])->where('name', $data['name'])->exists()) {
+                throw new ServiceException('产品名称已存在');
+            }
             //查询category_id是否合法
             if (!InvCategory::where('merchant_id', $data['merchant_id'])->where('id', $data['category_id'])->exists()) {
                 throw new ServiceException('分类不存在');
