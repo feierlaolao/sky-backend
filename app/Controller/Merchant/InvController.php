@@ -204,7 +204,12 @@ class InvController extends AbstractController
         $data = $request->validatedWithMerchant();
         $this->itemService->addItem($data);
         return MyResponse::success()->toArray();
+    }
 
+    #[DeleteMapping('items/{id}')]
+    public function deleteItem($id): array
+    {
+        return MyResponse::success()->toArray();
     }
 
 }

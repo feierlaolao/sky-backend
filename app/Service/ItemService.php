@@ -7,6 +7,7 @@ use App\Model\FileAttachment;
 use App\Model\InvBrand;
 use App\Model\InvCategory;
 use App\Model\InvItemSku;
+use App\Model\InvItemSkuPrice;
 use App\Model\InvItemSpu;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
@@ -78,7 +79,18 @@ class ItemService
             $spu->brand_id = $data['brand_id'] ?? null;
             $spu->name = $data['name'];
             $spu->save();
-            $spu->sku()->saveMany($skus);
+            $skus = $spu->sku()->saveMany($skus);
+            //sku渠道价格目录
+            foreach ($skus as $index => $temp){
+                $skuPrices = [];
+                foreach ($data['sku'][$index]['price'] ?? [] as $temp2){
+                    $skuPrice = new InvItemSkuPrice();
+                    $skuPrice->channel_id = $temp2['channel_id'];
+                    $skuPrice->price = $temp2['price'];
+                    $skuPrices[] = $skuPrice;
+                }
+                $temp->skuPrice()->saveMany($skuPrices);
+            }
             //创建图片引用
 
             return $spu;

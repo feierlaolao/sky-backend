@@ -6,6 +6,7 @@ namespace App\Model;
 
 
 
+use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
@@ -36,4 +37,9 @@ class InvItemSku extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['conversion_to_base' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function skuPrice(): HasMany
+    {
+        return $this->hasMany(InvItemSkuPrice::class, 'sku_id', 'id');
+    }
 }

@@ -26,6 +26,9 @@ class ItemsRequest extends FormRequest
             'sku.*.name' => 'required|string',
             'sku.*.barcode' => 'string',
             'sku.*.base_sku_id' => 'string',
+            'sku.*.price' => 'array',
+            'sku.*.price.*.channel_id' => 'string',
+            'sku.*.price.*.price' => 'numeric',
             'sku.*.conversion_to_base' => 'required|numeric',
         ];
     }
