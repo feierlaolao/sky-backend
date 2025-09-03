@@ -12,7 +12,6 @@ use App\Model\InvItemSpu;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Db;
-use function Symfony\Component\Translation\t;
 
 class ItemService
 {
@@ -22,7 +21,7 @@ class ItemService
         return InvItemSpu::when(isset($data['sortBy']), fn(Builder $query) => $query->orderByDesc($data['sortBy']))
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
-            ->with(['sku', 'category', 'brand'])
+            ->with(['sku.price', 'category', 'brand'])
             ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
     }
 
@@ -89,7 +88,7 @@ class ItemService
                     $skuPrice->price = $temp2['price'];
                     $skuPrices[] = $skuPrice;
                 }
-                $temp->skuPrice()->saveMany($skuPrices);
+                $temp->price()->saveMany($skuPrices);
             }
             //创建图片引用
 

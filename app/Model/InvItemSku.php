@@ -38,7 +38,7 @@ class InvItemSku extends Model
      */
     protected array $casts = ['conversion_to_base' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
-    public function skuPrice(): HasMany
+    public function price(): HasMany
     {
         return $this->hasMany(InvItemSkuPrice::class, 'sku_id', 'id');
     }
