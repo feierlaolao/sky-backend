@@ -25,6 +25,7 @@ class GetItemsRequest extends PaginatedFormRequest
     {
         return array_merge(parent::rules(), [
             'name' => '',
+            'category_id' => '',
             'sortBy' => '',
         ]);
     }

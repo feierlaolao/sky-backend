@@ -20,6 +20,7 @@ class ItemService
     {
         return InvItemSpu::when(isset($data['sortBy']), fn(Builder $query) => $query->orderByDesc($data['sortBy']))
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
+            ->when(isset($data['category_id']), fn(Builder $query) => $query->where('category_id', $data['category_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
             ->with(['sku.price', 'category', 'brand'])
             ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
