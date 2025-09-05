@@ -217,7 +217,7 @@ class InvController extends AbstractController
     public function getSkuBarcode(string $barcode): array
     {
         $res = $this->itemService->getSkuByBarcode($barcode);
-        return MyResponse::formPaginator($res)->toArray();
+        return MyResponse::success($res)->toArray();
 
     }
 
