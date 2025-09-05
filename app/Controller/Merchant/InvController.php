@@ -17,7 +17,7 @@ use App\Request\Merchant\ItemsRequest;
 use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
 use App\Service\Inv\ChannelService;
-use App\Service\ItemService;
+use App\Service\Inv\ItemService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -210,6 +210,15 @@ class InvController extends AbstractController
     public function deleteItem($id): array
     {
         return MyResponse::success()->toArray();
+    }
+
+
+    #[GetMapping('sku/{barcode}')]
+    public function getSkuBarcode(string $barcode): array
+    {
+        $res = $this->itemService->getSkuByBarcode($barcode);
+        return MyResponse::formPaginator($res)->toArray();
+
     }
 
 }

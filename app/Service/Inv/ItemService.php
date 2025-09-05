@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Inv;
 
 use App\Exception\ServiceException;
 use App\Model\FileAttachment;
@@ -97,5 +97,12 @@ class ItemService
         });
     }
 
+
+    public function getSkuByBarCode(string $barcode)
+    {
+        return InvItemSku::where('barcode', $barcode)
+            ->with('spu','price')
+            ->first();
+    }
 
 }
