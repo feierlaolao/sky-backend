@@ -13,6 +13,7 @@ use App\Request\Merchant\GetItemsRequest;
 use App\Request\Merchant\InvBrandRequest;
 use App\Request\Merchant\InvCategoryRequest;
 use App\Request\Merchant\InvChannelRequest;
+use App\Request\Merchant\InvPurchaseOrderRequest;
 use App\Request\Merchant\ItemsRequest;
 use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
@@ -198,6 +199,13 @@ class InvController extends AbstractController
         return MyResponse::success($data)->toArray();
     }
 
+    #[PatchMapping('items/{id}')]
+    public function updateItem(string $id)
+    {
+//        $this->itemService
+        return MyResponse::success()->toArray();
+    }
+
     #[PostMapping('items')]
     public function addItem(ItemsRequest $request): array
     {
@@ -218,7 +226,15 @@ class InvController extends AbstractController
     {
         $res = $this->itemService->getSkuByBarcode($barcode);
         return MyResponse::success($res)->toArray();
+    }
 
+
+    #[PostMapping('purchase-orders')]
+    public function addPurchaseOrder(InvPurchaseOrderRequest $request): array
+    {
+        $data = $request->validated();
+
+        return MyResponse::success()->toArray();
     }
 
 }

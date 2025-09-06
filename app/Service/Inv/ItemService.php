@@ -67,6 +67,10 @@ class ItemService
 
             $skus = [];
             foreach ($data['sku'] ?? [] as $value) {
+                //查询barcode有没有被占用
+                if (InvItemSku::where('barcode', $value['barcode'])->exists()){
+                    throw new ServiceException('条形码已存在');
+                }
                 $sku = new InvItemSku();
                 $sku->name = $value['name'];
                 $sku->barcode = $value['barcode'];
@@ -95,6 +99,12 @@ class ItemService
 
             return $spu;
         });
+    }
+
+
+    public function updateItem($data)
+    {
+        InvItemSpu::where('id', $data['id'])->where('merchant_id', $data['merchant_id'])->exists();
     }
 
 
