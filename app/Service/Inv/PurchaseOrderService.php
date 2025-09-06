@@ -7,6 +7,7 @@ use App\Model\InvChannel;
 use App\Model\InvItemSku;
 use App\Model\InvItemSkuPrice;
 use App\Model\InvPurchaseOrder;
+use App\Model\InvPurchaseOrderItem;
 use App\Request\Merchant\InvPurchaseOrderRequest;
 use Hyperf\DbConnection\Db;
 
@@ -27,10 +28,24 @@ class PurchaseOrderService
                 throw new ServiceException('以下SKU不存在: ' . implode(',', $missing));
             }
             //获取渠道价格，计算总价
-            $existsPriceSkuIds = InvItemSkuPrice::whereIn('sku_id', $sku_ids)->where('channel_id', $data['channel_id'])->pluck('sku_id')->all();
-            $missingPriceSkuIds = array_diff($sku_ids, $existsPriceSkuIds);
+            $existsPrice = InvItemSkuPrice::whereIn('sku_id', $sku_ids)
+                ->where('channel_id', $data['channel_id'])
+                ->with('sku.parent')
+                ->get()
+                ->toArray();
+            $missingPriceSkuIds = array_diff($sku_ids, array_column($existsPrice, 'sku_id'));
             if ($missingPriceSkuIds) {
                 throw new ServiceException('以下SKU渠道价格不存在: ' . implode(',', $missingPriceSkuIds));
+            }
+
+            $items = [];
+            foreach ($data['items'] as $item) {
+                $temp = new InvPurchaseOrderItem();
+                $temp->sku_id = $item['sku_id'];
+                $temp->unit_price = $existsPrice[$item['sku_id']]['price'];
+                $temp->total_price = $existsPrice[$item['sku_id']]['price'] * $item['quantity'];
+
+                $items[] = $temp;
             }
 
 //            $purchaseOrder = new InvPurchaseOrder();

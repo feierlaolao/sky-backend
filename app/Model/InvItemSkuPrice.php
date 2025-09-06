@@ -6,6 +6,7 @@ namespace App\Model;
 
 
 
+use Hyperf\Database\Model\Relations\BelongsTo;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
@@ -33,4 +34,10 @@ class InvItemSkuPrice extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function sku(): BelongsTo
+    {
+        return $this->belongsTo(InvItemSku::class, 'sku_id','id');
+    }
+
 }

@@ -19,6 +19,7 @@ use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
 use App\Service\Inv\ChannelService;
 use App\Service\Inv\ItemService;
+use App\Service\Inv\PurchaseOrderService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -47,6 +48,9 @@ class InvController extends AbstractController
 
     #[Inject]
     protected ItemService $itemService;
+
+    #[Inject]
+    protected PurchaseOrderService $purchaseOrderService;
 
     #[GetMapping('categories')]
     public function getCategories(GetCategoriesRequest $request): array
@@ -233,7 +237,7 @@ class InvController extends AbstractController
     public function addPurchaseOrder(InvPurchaseOrderRequest $request): array
     {
         $data = $request->validatedWithMerchant();
-
+        $this->purchaseOrderService->addPurchaseOrder($data);
         return MyResponse::success()->toArray();
     }
 

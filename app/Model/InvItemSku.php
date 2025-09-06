@@ -48,4 +48,10 @@ class InvItemSku extends Model
     {
         return $this->hasMany(InvItemSkuPrice::class, 'sku_id', 'id');
     }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'base_sku_id','id');
+    }
+
 }
