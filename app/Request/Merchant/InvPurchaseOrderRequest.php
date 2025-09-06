@@ -36,8 +36,8 @@ class InvPurchaseOrderRequest extends FormRequest
             'channel_id.required' => '渠道编号不能为空',
             'items.required' => '商品列表不能为空',
             'items.array' => '商品列表不正确',
-            'items.*.sku_id.required' => '第 :position 个产品缺少sku_id',
-            'items.*.quantity.required' => '第 :position 产品缺少数量',
+            'items.*.sku_id.required' => ':attribute 缺少sku_id',
+            'items.*.quantity.required' => ':attribute 缺少数量',
         ];
     }
 }
