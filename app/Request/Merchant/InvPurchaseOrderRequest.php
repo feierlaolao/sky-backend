@@ -8,6 +8,7 @@ use Hyperf\Validation\Request\FormRequest;
 
 class InvPurchaseOrderRequest extends FormRequest
 {
+    use BaseMerchant;
     /**
      * Determine if the user is authorized to make this request.
      */

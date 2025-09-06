@@ -232,7 +232,7 @@ class InvController extends AbstractController
     #[PostMapping('purchase-orders')]
     public function addPurchaseOrder(InvPurchaseOrderRequest $request): array
     {
-        $data = $request->validated();
+        $data = $request->validatedWithMerchant();
 
         return MyResponse::success()->toArray();
     }
