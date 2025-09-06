@@ -39,11 +39,11 @@ class PurchaseOrderService
             }
 
             $items = [];
-            foreach ($data['items'] as $item) {
+            foreach ($data['items'] as $index => $item) {
                 $temp = new InvPurchaseOrderItem();
                 $temp->sku_id = $item['sku_id'];
-                $temp->unit_price = $existsPrice[$item['sku_id']]['price'];
-                $temp->total_price = $existsPrice[$item['sku_id']]['price'] * $item['quantity'];
+                $temp->unit_price = $existsPrice[$index]['price'];
+                $temp->total_price = $existsPrice[$index]['price'] * $item['quantity'];
 
                 $items[] = $temp;
             }
