@@ -10,15 +10,19 @@ use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
- * @property string $id
- * @property string $spu_id
- * @property string $name
- * @property string $barcode
- * @property string $base_sku_id
- * @property int $conversion_to_base
- * @property string $attrs
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property string $id 
+ * @property string $merchant_id 
+ * @property string $spu_id 
+ * @property string $name 
+ * @property string $barcode 
+ * @property string $base_sku_id 
+ * @property int $conversion_to_base 
+ * @property string $attrs 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property-read null|InvItemSpu $spu 
+ * @property-read null|\Hyperf\Database\Model\Collection|InvItemSkuPrice[] $price 
+ * @property-read null|self $parent 
  */
 class InvItemSku extends Model
 {
@@ -32,7 +36,7 @@ class InvItemSku extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'spu_id', 'name', 'barcode', 'base_sku_id', 'conversion_to_base', 'attrs', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'merchant_id', 'spu_id', 'name', 'barcode', 'base_sku_id', 'conversion_to_base', 'attrs', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.

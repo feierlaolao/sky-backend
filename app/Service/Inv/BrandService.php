@@ -4,7 +4,6 @@ namespace App\Service\Inv;
 
 use App\Exception\ServiceException;
 use App\Model\InvBrand;
-use App\Model\InvCategory;
 use App\Model\InvItemSpu;
 use Hyperf\Database\Model\Builder;
 

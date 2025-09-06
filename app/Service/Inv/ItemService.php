@@ -74,6 +74,7 @@ class ItemService
                 $sku = new InvItemSku();
                 $sku->name = $value['name'];
                 $sku->barcode = $value['barcode'];
+                $sku->merchant_id = $data['merchant_id'];
                 $sku->conversion_to_base = $value['conversion_to_base'];
                 $skus[] = $sku;
             }
