@@ -77,7 +77,8 @@ class InvController extends AbstractController
     public function getCategory($id): array
     {
         $category = $this->categoryService->getCategoryByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
-        return MyResponse::success($category)->toArray();
+        $data = CategoryResource::make($category)->toArray();
+        return MyResponse::success($data)->toArray();
     }
 
     #[PatchMapping('categories/{id}')]
