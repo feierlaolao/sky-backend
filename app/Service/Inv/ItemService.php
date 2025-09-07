@@ -31,7 +31,7 @@ class ItemService
     {
         return InvItemSpu::where('id', $id)
             ->where('merchant_id', $merchant_id)
-            ->with('sku')
+            ->with(['skus.price', 'skus.children', 'category', 'brand', 'images.attachment'])
             ->first();
     }
 

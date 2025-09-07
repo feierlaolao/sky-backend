@@ -125,7 +125,8 @@ class InvController extends AbstractController
     public function getBrand($id): array
     {
         $brand = $this->brandService->getBrandByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
-        return MyResponse::success($brand)->toArray();
+        $data = BrandResource::make($brand)->toArray();
+        return MyResponse::success($data)->toArray();
     }
 
     #[PatchMapping('brands/{id}')]
@@ -172,7 +173,8 @@ class InvController extends AbstractController
     public function getChannel($id): array
     {
         $channel = $this->channelService->getChannelByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
-        return MyResponse::success($channel)->toArray();
+        $data = ChannelResource::make($channel)->toArray();
+        return MyResponse::success($data)->toArray();
     }
 
     #[PatchMapping('channels/{id}')]
@@ -209,7 +211,8 @@ class InvController extends AbstractController
     #[GetMapping('items/{id}')]
     public function getItem($id): array
     {
-        $data = $this->itemService->getItemByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
+        $item = $this->itemService->getItemByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
+        $data = ItemResource::make($item)->toArray();
         return MyResponse::success($data)->toArray();
     }
 
