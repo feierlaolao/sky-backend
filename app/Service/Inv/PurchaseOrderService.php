@@ -10,6 +10,7 @@ use App\Model\InvPurchaseOrder;
 use App\Model\InvPurchaseOrderItem;
 use App\Request\Merchant\InvPurchaseOrderRequest;
 use Hyperf\DbConnection\Db;
+use function Hyperf\Collection\collect;
 
 class PurchaseOrderService
 {
@@ -17,36 +18,48 @@ class PurchaseOrderService
     public function addPurchaseOrder($data): void
     {
         Db::transaction(function () use ($data) {
+
+            $items = $data['items'];
+
             //查询渠道是否存在
             if (!InvChannel::where('type', 0)->where('id', $data['channel_id'])->where('merchant_id', $data['merchant_id'])->exists()) {
                 throw new ServiceException('进货渠道不存在');
             }
-            $sku_ids = array_column($data['items'], 'sku_id');
-            $exists = InvItemSku::whereIn('id', $sku_ids)->where('merchant_id', $data['merchant_id'])->pluck('id')->all();
-            $missing = array_diff($sku_ids, $exists);
+
+            //重复的合并sku
+            $mergedItems = collect($items)->groupBy('sku_id')->map(fn($group) => [
+                'sku_id' => $group->first()['sku_id'],
+                'quantity' => $group->sum('quantity'),
+            ])->values()->all();
+
+            //查询sku
+            $sku_ids = array_column($mergedItems, 'sku_id');
+            $skus = InvItemSku::whereIn('id', $sku_ids)
+                ->where('merchant_id', $data['merchant_id'])
+                ->with(['price' => function ($query) use ($data) {
+                    $query->where('channel_id', $data['channel_id']);
+                }, 'parent', 'spu'])
+                ->get();
+            //判断sku_id是否存在
+            $missing = array_diff($sku_ids, $skus->pluck('id')->all());
             if ($missing) {
                 throw new ServiceException('以下SKU不存在: ' . implode(',', $missing));
             }
-            //获取渠道价格，计算总价
-            $existsPrice = InvItemSkuPrice::whereIn('sku_id', $sku_ids)
-                ->where('channel_id', $data['channel_id'])
-                ->with('sku.parent')
-                ->get()
-                ->toArray();
-            $missingPriceSkuIds = array_diff($sku_ids, array_column($existsPrice, 'sku_id'));
-            if ($missingPriceSkuIds) {
-                throw new ServiceException('以下SKU渠道价格不存在: ' . implode(',', $missingPriceSkuIds));
+
+            foreach ($skus as $sku) {
+                if ($sku->price == null) {
+                    throw new ServiceException('SKU渠道价格不存在:' . $sku->spu->name . '-' . $sku->name);
+                }
             }
 
-            $items = [];
-            foreach ($data['items'] as $index => $item) {
-                $temp = new InvPurchaseOrderItem();
-                $temp->sku_id = $item['sku_id'];
-                $temp->unit_price = $existsPrice[$index]['price'];
-                $temp->total_price = $existsPrice[$index]['price'] * $item['quantity'];
-
-                $items[] = $temp;
-            }
+//            foreach ($mergedItems as $index => $item) {
+//                $temp = new InvPurchaseOrderItem();
+//                $temp->sku_id = $item['sku_id'];
+//                $temp->unit_price = $existsPrice[$index]['price'];
+//                $temp->total_price = $existsPrice[$index]['price'] * $item['quantity'];
+//
+//
+//            }
 
 //            $purchaseOrder = new InvPurchaseOrder();
 //            $purchaseOrder->merchant_id = $data['merchant_id'];
