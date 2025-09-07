@@ -47,7 +47,7 @@ class PurchaseOrderService
             }
 
             foreach ($skus as $sku) {
-                if ($sku->price == null) {
+                if (empty($sku->price)) {
                     throw new ServiceException('SKU渠道价格不存在:' . $sku->spu->name . '-' . $sku->name);
                 }
             }
