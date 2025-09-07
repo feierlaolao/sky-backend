@@ -22,7 +22,7 @@ class ItemService
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
             ->when(isset($data['category_id']), fn(Builder $query) => $query->where('category_id', $data['category_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
-            ->with(['sku.price', 'category', 'brand'])
+            ->with(['sku.price', 'category', 'brand', 'images'])
             ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
     }
 
@@ -68,7 +68,7 @@ class ItemService
             $skus = [];
             foreach ($data['sku'] ?? [] as $value) {
                 //查询barcode有没有被占用
-                if (InvItemSku::where('barcode', $value['barcode'])->exists()){
+                if (InvItemSku::where('barcode', $value['barcode'])->exists()) {
                     throw new ServiceException('条形码已存在');
                 }
                 $sku = new InvItemSku();
@@ -86,9 +86,9 @@ class ItemService
             $spu->save();
             $skus = $spu->sku()->saveMany($skus);
             //sku渠道价格目录
-            foreach ($skus as $index => $temp){
+            foreach ($skus as $index => $temp) {
                 $skuPrices = [];
-                foreach ($data['sku'][$index]['price'] ?? [] as $temp2){
+                foreach ($data['sku'][$index]['price'] ?? [] as $temp2) {
                     $skuPrice = new InvItemSkuPrice();
                     $skuPrice->channel_id = $temp2['channel_id'];
                     $skuPrice->price = $temp2['price'];
@@ -112,7 +112,7 @@ class ItemService
     public function getSkuByBarCode(string $barcode)
     {
         return InvItemSku::where('barcode', $barcode)
-            ->with('spu','price')
+            ->with('spu', 'price')
             ->first();
     }
 

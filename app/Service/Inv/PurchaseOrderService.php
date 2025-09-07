@@ -40,6 +40,7 @@ class PurchaseOrderService
                     $query->where('channel_id', $data['channel_id']);
                 }, 'parent', 'spu'])
                 ->get();
+
             //判断sku_id是否存在
             $missing = array_diff($sku_ids, $skus->pluck('id')->all());
             if ($missing) {
@@ -47,6 +48,7 @@ class PurchaseOrderService
             }
 
             foreach ($skus as $sku) {
+                var_dump($sku->price);
                 if (empty($sku->price)) {
                     throw new ServiceException('SKU渠道价格不存在:' . $sku->spu->name . '-' . $sku->name);
                 }
