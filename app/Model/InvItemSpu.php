@@ -40,7 +40,7 @@ class InvItemSpu extends Model
      */
     protected array $casts = ['created_at' => 'datetime', 'updated_at' => 'datetime'];
 
-    public function sku(): HasMany
+    public function skus(): HasMany
     {
         return $this->hasMany(InvItemSku::class, 'spu_id', 'id');
     }

@@ -13,11 +13,15 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Exception\ServiceException;
+use App\Model\FileUsage;
+use App\Model\InvItemSpu;
 use App\MyResponse;
 use App\Request\LoginRequest;
+use App\Resource\ItemResource;
 use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use Qbhy\HyperfAuth\AuthManager;
 
@@ -46,5 +50,12 @@ class IndexController extends AbstractController
         return MyResponse::success([
             'token' => $token
         ])->toArray();
+    }
+
+    #[GetMapping('test')]
+    public function test()
+    {
+        $data = InvItemSpu::with(['category','brand','skus.children','images.attachment'])->paginate();
+        return ItemResource::collection($data)->toArray();
     }
 }

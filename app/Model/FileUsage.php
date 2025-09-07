@@ -6,6 +6,8 @@ namespace App\Model;
 
 
 
+use Hyperf\Database\Model\Relations\BelongsTo;
+
 /**
  * @property string $id 
  * @property string $attachment_id 
@@ -30,4 +32,10 @@ class FileUsage extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function attachment(): BelongsTo
+    {
+        return $this->belongsTo(FileAttachment::class, 'attachment_id', 'id');
+    }
+
 }

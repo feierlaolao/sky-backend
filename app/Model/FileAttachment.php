@@ -9,18 +9,18 @@ namespace App\Model;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
- * @property string $id 
- * @property string $upload_user_id 
- * @property string $bucket 
- * @property string $object_key 
- * @property string $mime 
- * @property int $size_bytes 
- * @property string $sha256 
- * @property int $width 
- * @property int $height 
- * @property int $status 
- * @property \Carbon\Carbon $created_at 
- * @property \Carbon\Carbon $updated_at 
+ * @property string $id
+ * @property string $upload_user_id
+ * @property string $bucket
+ * @property string $object_key
+ * @property string $mime
+ * @property int $size_bytes
+ * @property string $sha256
+ * @property int $width
+ * @property int $height
+ * @property int $status
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class FileAttachment extends Model
 {
@@ -40,5 +40,16 @@ class FileAttachment extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['size_bytes' => 'integer', 'width' => 'integer', 'height' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['url'=>'string','size_bytes' => 'integer', 'width' => 'integer', 'height' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    protected array $appends = [
+        'url'
+    ];
+
+
+    public function getUrlAttribute()
+    {
+        return '123';
+    }
+
 }

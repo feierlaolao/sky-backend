@@ -15,6 +15,7 @@ use App\Request\Merchant\InvCategoryRequest;
 use App\Request\Merchant\InvChannelRequest;
 use App\Request\Merchant\InvPurchaseOrderRequest;
 use App\Request\Merchant\ItemsRequest;
+use App\Resource\ItemResource;
 use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
 use App\Service\Inv\ChannelService;
@@ -193,7 +194,9 @@ class InvController extends AbstractController
     public function getItems(GetItemsRequest $request): array
     {
         $data = $request->validatedWithMerchant();
-        return MyResponse::formPaginator($this->itemService->items($data))->toArray();
+        $res = $this->itemService->items($data);
+        $items = ItemResource::collection($res)->toArray();
+        return MyResponse::page($items, $res->currentPage(), $res->perPage(), $res->total())->toArray();
     }
 
     #[GetMapping('items/{id}')]

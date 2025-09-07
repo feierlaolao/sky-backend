@@ -26,7 +26,7 @@ class FileController
     public function upload(FileUploadRequest $request)
     {
         $data = $request->validated();
-        $key = 'uploads/' . md5(uniqid('', true)) . '.' . $data['extension'];
+        $key = '/uploads/' . md5(uniqid('', true)) . '.' . $data['extension'];
         $bucket = env('S3_BUCKET');
         $fileAttachment = $this->fileService->addFile([
             'bucket' => $bucket,
