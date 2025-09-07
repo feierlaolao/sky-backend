@@ -15,6 +15,9 @@ use App\Request\Merchant\InvCategoryRequest;
 use App\Request\Merchant\InvChannelRequest;
 use App\Request\Merchant\InvPurchaseOrderRequest;
 use App\Request\Merchant\ItemsRequest;
+use App\Resource\BrandResource;
+use App\Resource\CategoryResource;
+use App\Resource\ChannelResource;
 use App\Resource\ItemResource;
 use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
@@ -58,7 +61,8 @@ class InvController extends AbstractController
     {
         $data = $request->validatedWithMerchant();
         $res = $this->categoryService->getCategoryList($data);
-        return MyResponse::formPaginator($res)->toArray();
+        $temp = CategoryResource::collection($res);
+        return MyResponse::page($temp, $res->currentPage(), $res->perPage(), $res->total())->toArray();
     }
 
     #[PostMapping('categories')]
@@ -103,7 +107,8 @@ class InvController extends AbstractController
     {
         $data = $request->validatedWithMerchant();
         $res = $this->brandService->getBrandList($data);
-        return MyResponse::formPaginator($res)->toArray();
+        $temp = BrandResource::collection($res);
+        return MyResponse::page($temp, $res->currentPage(), $res->perPage(), $res->total())->toArray();
     }
 
 
@@ -149,7 +154,8 @@ class InvController extends AbstractController
     {
         $data = $request->validatedWithMerchant();
         $res = $this->channelService->getChannelList($data);
-        return MyResponse::formPaginator($res)->toArray();
+        $temp = ChannelResource::collection($res);
+        return MyResponse::page($temp, $res->currentPage(), $res->perPage(), $res->total())->toArray();
     }
 
 
