@@ -143,6 +143,33 @@ class ItemService
             $spu->save();
 
 
+            $imageIds = array_values(array_unique($data['images'] ?? []));
+            //查询当前的所有图片
+            $currentUsages = FileUsage::where('owner_type', 'spu')->where('owner_id', $spu->id)
+                ->pluck('attachment_id')->all();
+            $toAdd = array_values(array_diff($imageIds, $currentUsages));
+            $toRemove = array_values(array_diff($currentUsages, $imageIds));
+
+            if ($toRemove) {
+                FileUsage::query()
+                    ->where('owner_type', 'spu')
+                    ->where('owner_id', $spu->id)
+                    ->whereIn('attachment_id', $toRemove)
+                    ->delete();
+            }
+
+            if ($toAdd) {
+                $rows = [];
+                foreach ($toAdd as $aid) {
+                    $rows[] = [
+                        'attachment_id' => $aid,
+                        'owner_type'    => 'spu',
+                        'owner_id'      => $spu->id,
+                    ];
+                }
+                FileUsage::query()->insert($rows);
+            }
+
             //查询当前所有的skuId
 //            $existsIds = InvItemSku::where('spu_id', $spu->id)->pluck('id')->all();
 
