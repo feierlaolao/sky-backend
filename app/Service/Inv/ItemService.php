@@ -7,7 +7,9 @@ use App\Model\FileAttachment;
 use App\Model\FileUsage;
 use App\Model\InvBrand;
 use App\Model\InvCategory;
+use App\Model\InvChannel;
 use App\Model\InvItemSku;
+use App\Model\InvItemSkuPrice;
 use App\Model\InvItemSpu;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
@@ -223,6 +225,63 @@ class ItemService
 
     }
 
+
+    public function skuPriceList($data): LengthAwarePaginatorInterface
+    {
+        return InvItemSkuPrice::when(isset($data['type']), function ($query) use ($data) {
+            $query->where('type', $data['type']);
+        })->when(isset($data['sku_id']), function ($query) use ($data) {
+            $query->where('sku_id', $data['sku_id']);
+        })->when(isset($data['channel_id']), function ($query) use ($data) {
+            $query->where('channel_id', $data['channel_id']);
+        })->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+    }
+
+    public function addSkuPrice($data): void
+    {
+        if (!InvItemSku::where('merchant_id', $data['merchant_id'])->where('id', $data['sku_id'])->exists()){
+            throw new ServiceException('SKU不存在');
+        }
+        $channel = InvChannel::where('merchant_id', $data['merchant_id'])->where('id', $data['channel_id'])->first();
+        if ($channel == null){
+            throw new ServiceException('渠道不存在');
+        }
+        $invItemSkuPrice = new InvItemSkuPrice();
+        $invItemSkuPrice->merchant_id = $data['merchant_id'];
+        $invItemSkuPrice->sku_id = $data['sku_id'];
+        $invItemSkuPrice->channel_id = $data['channel_id'];
+        $invItemSkuPrice->type = $channel->type;
+        $invItemSkuPrice->price = $data['price'];
+        $invItemSkuPrice->save();
+    }
+
+    public function updateSkuPrice($id,$data): void
+    {
+        $invItemSkuPrice = InvItemSkuPrice::where('merchant_id', $data['merchant_id'])->where('id', $id)->first();
+        if ($invItemSkuPrice == null){
+            throw new ServiceException('SKU不存在');
+        }
+        if ($data['channel_id'] != $invItemSkuPrice->channel_id){
+            $channel = InvChannel::where('merchant_id', $data['merchant_id'])->where('id', $data['channel_id'])->first();
+            if ($channel == null){
+                throw new ServiceException('渠道不正确');
+            }
+            $invItemSkuPrice->channel_id = $channel->id;
+            $invItemSkuPrice->type = $channel->type;
+        }
+        $invItemSkuPrice->price = $data['price'];
+        $invItemSkuPrice->save();
+    }
+
+    public function getSkuPriceByMerchantIdAndId($merchantId, $id)
+    {
+        return InvItemSkuPrice::where('merchant_id', $merchantId)->where('id', $id)->first();
+    }
+
+    public function deleteSkuPrice($id): void
+    {
+        InvItemSkuPrice::where('id', $id)->delete();
+    }
 
     public function getSkuByBarCode(string $barcode)
     {

@@ -10,15 +10,18 @@ use App\Request\Merchant\GetBrandsRequest;
 use App\Request\Merchant\GetCategoriesRequest;
 use App\Request\Merchant\GetChannelsRequest;
 use App\Request\Merchant\GetItemsRequest;
+use App\Request\Merchant\GetSkuPricesRequest;
 use App\Request\Merchant\InvBrandRequest;
 use App\Request\Merchant\InvCategoryRequest;
 use App\Request\Merchant\InvChannelRequest;
 use App\Request\Merchant\InvPurchaseOrderRequest;
 use App\Request\Merchant\ItemsRequest;
+use App\Request\Merchant\SkuPricesRequest;
 use App\Resource\BrandResource;
 use App\Resource\CategoryResource;
 use App\Resource\ChannelResource;
 use App\Resource\ItemResource;
+use App\Resource\ItemSkuPriceResource;
 use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
 use App\Service\Inv\ChannelService;
@@ -238,6 +241,42 @@ class InvController extends AbstractController
         return MyResponse::success()->toArray();
     }
 
+
+    #[GetMapping('sku-prices')]
+    public function skuPrices(GetSkuPricesRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $temp = $this->itemService->skuPriceList($data);
+        $data = ItemSkuPriceResource::collection($temp);
+        return MyResponse::page($data, $temp->currentPage(), $temp->perPage(), $temp->total())->toArray();
+    }
+
+    #[PostMapping('sku-prices')]
+    public function addSkuPrice(SkuPricesRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $this->itemService->addSkuPrice($data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[PatchMapping('sku-prices/{id}')]
+    public function updateSkuPrice(string $id, SkuPricesRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $this->itemService->updateSkuPrice($id, $data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[DeleteMapping('sku-prices/{id}')]
+    public function deleteSkuPrice($id): array
+    {
+        $skuPrice = $this->itemService->getSkuPriceByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
+        if ($skuPrice == null) {
+            throw new ServiceException('价格不存在');
+        }
+        $this->itemService->deleteSkuPrice($id);
+        return MyResponse::success()->toArray();
+    }
 
     #[GetMapping('sku/{barcode}')]
     public function getSkuBarcode(string $barcode): array
