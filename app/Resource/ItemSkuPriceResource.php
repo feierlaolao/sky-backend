@@ -16,6 +16,7 @@ class ItemSkuPriceResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type,
+            'sku_id' => $this->sku_id,
             'channel_id' => $this->channel_id,
             'price' => $this->price
         ];

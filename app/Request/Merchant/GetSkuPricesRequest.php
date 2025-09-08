@@ -25,6 +25,7 @@ class GetSkuPricesRequest extends PaginatedFormRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
+            'sku_id' => 'string',
             'type' => 'in:0,1',
             'channel_id' => 'string',
             'sortBy' => 'in:created_at',

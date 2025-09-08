@@ -110,9 +110,9 @@ class ItemService
     }
 
 
-    public function updateItem($id,$data)
+    public function updateItem($id, $data)
     {
-        Db::transaction(function () use ($id,$data) {
+        Db::transaction(function () use ($id, $data) {
             $spu = InvItemSpu::where('id', $id)
                 ->where('merchant_id', $data['merchant_id'])
                 ->first();
@@ -165,8 +165,8 @@ class ItemService
                 foreach ($toAdd as $aid) {
                     $rows[] = [
                         'attachment_id' => $aid,
-                        'owner_type'    => 'spu',
-                        'owner_id'      => $spu->id,
+                        'owner_type' => 'spu',
+                        'owner_id' => $spu->id,
                     ];
                 }
                 FileUsage::query()->insert($rows);
@@ -189,7 +189,7 @@ class ItemService
                     $sku->base_sku_id = $base_sku_id;
                     $sku->conversion_to_base = $row['conversion_to_base'] ?? 1;
                     $sku->save();
-                }else{
+                } else {
                     //新增
                     $sku = new InvItemSku();
                     $sku->merchant_id = $data['merchant_id'];
@@ -209,12 +209,12 @@ class ItemService
                 $saveSku($skuRow, $spu->id, null);
             }
             //删除未出现的sku
-            if (!empty($nowIds)){
+            if (!empty($nowIds)) {
                 InvItemSku::where('merchant_id', $data['merchant_id'])
                     ->where('spu_id', $spu->id)
                     ->whereNotIn('id', $nowIds)
                     ->delete();
-            }else{
+            } else {
                 //删除所有的sku
                 InvItemSku::where('merchant_id', $data['merchant_id'])
                     ->where('spu_id', $spu->id)
@@ -234,16 +234,18 @@ class ItemService
             $query->where('sku_id', $data['sku_id']);
         })->when(isset($data['channel_id']), function ($query) use ($data) {
             $query->where('channel_id', $data['channel_id']);
+        })->when(isset($data['merchant_id']), function ($query) use ($data) {
+            $query->where('merchant_id', $data['merchant_id']);
         })->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
     }
 
     public function addSkuPrice($data): void
     {
-        if (!InvItemSku::where('merchant_id', $data['merchant_id'])->where('id', $data['sku_id'])->exists()){
+        if (!InvItemSku::where('merchant_id', $data['merchant_id'])->where('id', $data['sku_id'])->exists()) {
             throw new ServiceException('SKU不存在');
         }
         $channel = InvChannel::where('merchant_id', $data['merchant_id'])->where('id', $data['channel_id'])->first();
-        if ($channel == null){
+        if ($channel == null) {
             throw new ServiceException('渠道不存在');
         }
         $invItemSkuPrice = new InvItemSkuPrice();
@@ -255,15 +257,15 @@ class ItemService
         $invItemSkuPrice->save();
     }
 
-    public function updateSkuPrice($id,$data): void
+    public function updateSkuPrice($id, $data): void
     {
         $invItemSkuPrice = InvItemSkuPrice::where('merchant_id', $data['merchant_id'])->where('id', $id)->first();
-        if ($invItemSkuPrice == null){
+        if ($invItemSkuPrice == null) {
             throw new ServiceException('SKU不存在');
         }
-        if ($data['channel_id'] != $invItemSkuPrice->channel_id){
+        if ($data['channel_id'] != $invItemSkuPrice->channel_id) {
             $channel = InvChannel::where('merchant_id', $data['merchant_id'])->where('id', $data['channel_id'])->first();
-            if ($channel == null){
+            if ($channel == null) {
                 throw new ServiceException('渠道不正确');
             }
             $invItemSkuPrice->channel_id = $channel->id;
