@@ -15,6 +15,7 @@ class ImageResource extends JsonResource
     public function toArray(): array
     {
         return [
+            'id' => $this->attachment->id,
             'url' => env('S3_ENDPOINT') . $this->attachment->object_key
         ];
     }

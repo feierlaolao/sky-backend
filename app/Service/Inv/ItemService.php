@@ -72,6 +72,7 @@ class ItemService
             $spu->category_id = $data['category_id'];
             $spu->brand_id = $data['brand_id'] ?? null;
             $spu->name = $data['name'];
+            $spu->description = $data['description'] ?? null;
             $spu->save();
 
             //创建图片引用
@@ -109,7 +110,39 @@ class ItemService
 
     public function updateItem($data)
     {
-        InvItemSpu::where('id', $data['id'])->where('merchant_id', $data['merchant_id'])->exists();
+        Db::transaction(function () use ($data) {
+            $spu = InvItemSpu::where('id', $data['id'])
+                ->where('merchant_id', $data['merchant_id'])
+                ->first();
+            if ($spu == null) {
+                throw new ServiceException('产品不存在');
+            }
+
+            if ($spu->name != $data['name']) {
+                //查询产品名称冲突
+                if (InvItemSpu::where('merchant_id', $data['merchant_id'])->where('name', $data['name'])->exists()) {
+                    throw new ServiceException('产品名称已存在');
+                }
+                $spu->name = $data['name'];
+            }
+
+            //查询category_id是否合法
+            if (!InvCategory::where('merchant_id', $data['merchant_id'])->where('id', $data['category_id'])->exists()) {
+                throw new ServiceException('分类不存在');
+            }
+            $spu->category_id = $data['category_id'];
+            //查询brand_id是否合法
+            if (isset($data['brand_id']) && !InvBrand::where('merchant_id', $data['merchant_id'])->where('id', $data['brand_id'])->exists()) {
+                throw new ServiceException('品牌不存在');
+            }
+            $spu->brand_id = $data['brand_id'] ?? null;
+            $spu->description = $data['description'] ?? null;
+            $spu->save();
+
+
+        });
+
+
     }
 
 
