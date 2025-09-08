@@ -41,15 +41,4 @@ class FileAttachment extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['url'=>'string','size_bytes' => 'integer', 'width' => 'integer', 'height' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
-
-    protected array $appends = [
-        'url'
-    ];
-
-
-    public function getUrlAttribute()
-    {
-        return '123';
-    }
-
 }
