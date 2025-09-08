@@ -25,6 +25,7 @@ class ItemsRequest extends FormRequest
             'images' => 'array',
             'skus' => 'array',
             //父sku
+            'skus.*.id' => 'string',
             'skus.*.name' => 'required|string',
             'skus.*.barcode' => 'string',
             'skus.*.conversion_to_base' => 'required|numeric',
@@ -32,6 +33,7 @@ class ItemsRequest extends FormRequest
 //            'skus.*.prices.*.channel_id' => 'required|string',
 //            'skus.*.prices.*.price' => 'required|numeric',
             //子sku
+            'skus.*.children.*.id' => 'string',
             'skus.*.children' => 'array',
             'skus.*.children.*.name' => 'required|string',
             'skus.*.children.*.barcode' => 'string',

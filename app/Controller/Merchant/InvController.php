@@ -217,9 +217,10 @@ class InvController extends AbstractController
     }
 
     #[PatchMapping('items/{id}')]
-    public function updateItem(string $id)
+    public function updateItem(string $id, ItemsRequest $request): array
     {
-//        $this->itemService
+        $data = $request->validatedWithMerchant();
+        $this->itemService->updateItem($id, $data);
         return MyResponse::success()->toArray();
     }
 

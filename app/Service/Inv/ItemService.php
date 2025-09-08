@@ -108,10 +108,10 @@ class ItemService
     }
 
 
-    public function updateItem($data)
+    public function updateItem($id,$data)
     {
-        Db::transaction(function () use ($data) {
-            $spu = InvItemSpu::where('id', $data['id'])
+        Db::transaction(function () use ($id,$data) {
+            $spu = InvItemSpu::where('id', $id)
                 ->where('merchant_id', $data['merchant_id'])
                 ->first();
             if ($spu == null) {
@@ -123,23 +123,74 @@ class ItemService
                 if (InvItemSpu::where('merchant_id', $data['merchant_id'])->where('name', $data['name'])->exists()) {
                     throw new ServiceException('产品名称已存在');
                 }
-                $spu->name = $data['name'];
+
             }
 
             //查询category_id是否合法
             if (!InvCategory::where('merchant_id', $data['merchant_id'])->where('id', $data['category_id'])->exists()) {
                 throw new ServiceException('分类不存在');
             }
-            $spu->category_id = $data['category_id'];
+
             //查询brand_id是否合法
             if (isset($data['brand_id']) && !InvBrand::where('merchant_id', $data['merchant_id'])->where('id', $data['brand_id'])->exists()) {
                 throw new ServiceException('品牌不存在');
             }
+
+            $spu->name = $data['name'];
+            $spu->category_id = $data['category_id'];
             $spu->brand_id = $data['brand_id'] ?? null;
             $spu->description = $data['description'] ?? null;
             $spu->save();
 
 
+            //查询当前所有的skuId
+//            $existsIds = InvItemSku::where('spu_id', $spu->id)->pluck('id')->all();
+
+            $nowIds = [];
+            //递归保存
+            $saveSku = function (array $row, $spu_id, $base_sku_id) use ($data, &$saveSku) {
+                if (!empty($row['id'])) {
+                    //更新
+                    $sku = InvItemSku::where('id', $row['id'])->where('merchant_id', $data['merchant_id'])->where('spu_id', $spu_id)->first();
+                    if ($sku == null) {
+                        throw new ServiceException('SKU不存在');
+                    }
+                    $sku->name = $row['name'];
+                    $sku->barcode = $row['barcode'] ?? null;
+                    $sku->base_sku_id = $base_sku_id;
+                    $sku->conversion_to_base = $row['conversion_to_base'] ?? 1;
+                    $sku->save();
+                }else{
+                    //新增
+                    $sku = new InvItemSku();
+                    $sku->merchant_id = $data['merchant_id'];
+                    $sku->spu_id = $spu_id;
+                    $sku->base_sku_id = $base_sku_id;
+                    $sku->name = $row['name'];
+                    $sku->barcode = $row['barcode'] ?? null;
+                    $sku->conversion_to_base = $row['conversion_to_base'] ?? 1;
+                    $sku->save();
+                }
+                $nowIds[] = $sku->id;
+                foreach (($row['children'] ?? []) as $childRow) {
+                    $saveSku($childRow, $spu_id, $sku->id);
+                }
+            };
+            foreach ($data['skus'] ?? [] as $skuRow) {
+                $saveSku($skuRow, $spu->id, null);
+            }
+            //删除未出现的sku
+            if (!empty($nowIds)){
+                InvItemSku::where('merchant_id', $data['merchant_id'])
+                    ->where('spu_id', $spu->id)
+                    ->whereNotIn('id', $nowIds)
+                    ->delete();
+            }else{
+                //删除所有的sku
+                InvItemSku::where('merchant_id', $data['merchant_id'])
+                    ->where('spu_id', $spu->id)
+                    ->delete();
+            }
         });
 
 
