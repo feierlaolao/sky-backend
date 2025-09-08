@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Middleware\MerchantAuthMiddleware;
 use App\MyResponse;
 use App\Request\FileUploadRequest;
 use App\Service\FileService;
@@ -9,10 +10,13 @@ use Aws\S3\S3Client;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\Middleware;
 use League\Flysystem\Filesystem;
+use Qbhy\HyperfAuth\AuthManager;
 use function Hyperf\Support\env;
 
 #[Controller('file')]
+#[Middleware(MerchantAuthMiddleware::class)]
 class FileController
 {
 
@@ -22,6 +26,9 @@ class FileController
     #[Inject]
     protected FileService $fileService;
 
+    #[Inject]
+    protected AuthManager $auth;
+
     #[GetMapping('upload')]
     public function upload(FileUploadRequest $request)
     {
@@ -30,7 +37,7 @@ class FileController
         $bucket = env('S3_BUCKET');
         $fileAttachment = $this->fileService->addFile([
             'bucket' => $bucket,
-            'upload_user_id' => '',
+            'upload_user_id' => $this->auth->guard('merchant_jwt')->id(),
             'object_key' => $key,
         ]);
         //获得s3的鉴权url
@@ -55,7 +62,7 @@ class FileController
         $request = $s3Client->createPresignedRequest($cmd, '+10 minutes');
         return MyResponse::success([
             'id' => (string)$fileAttachment->id,
-            'object_url' => env('S3_ENDPOINT').'/'.$key,
+            'object_url' => env('S3_ENDPOINT') . '/' . $key,
             'upload_url' => $request->getUri(),
         ])->toArray();
     }

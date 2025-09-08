@@ -8,7 +8,6 @@ use App\Model\FileUsage;
 use App\Model\InvBrand;
 use App\Model\InvCategory;
 use App\Model\InvItemSku;
-use App\Model\InvItemSkuPrice;
 use App\Model\InvItemSpu;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
