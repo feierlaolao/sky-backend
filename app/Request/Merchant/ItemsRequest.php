@@ -17,19 +17,28 @@ class ItemsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            //spu信息
             'name' => 'required|string',
             'category_id' => 'required|string',
             'brand_id' => 'string',
             'description' => 'string',
             'images' => 'array',
-            'sku' => 'array',
-            'sku.*.name' => 'required|string',
-            'sku.*.barcode' => 'string',
-            'sku.*.base_sku_id' => 'string',
-            'sku.*.price' => 'array',
-            'sku.*.price.*.channel_id' => 'string',
-            'sku.*.price.*.price' => 'numeric',
-            'sku.*.conversion_to_base' => 'required|numeric',
+            'skus' => 'array',
+            //父sku
+            'skus.*.name' => 'required|string',
+            'skus.*.barcode' => 'string',
+            'skus.*.conversion_to_base' => 'required|numeric',
+//            'skus.*.prices' => 'array',
+//            'skus.*.prices.*.channel_id' => 'required|string',
+//            'skus.*.prices.*.price' => 'required|numeric',
+            //子sku
+            'skus.*.children' => 'array',
+            'skus.*.children.*.name' => 'required|string',
+            'skus.*.children.*.barcode' => 'string',
+            'skus.*.children.*.conversion_to_base' => 'required|numeric',
+//            'skus.*.children.*.prices' => 'array',
+//            'skus.*.children.*.prices.*.channel_id' => 'required|string',
+//            'skus.*.children.*.prices.*.price' => 'required|numeric',
         ];
     }
 

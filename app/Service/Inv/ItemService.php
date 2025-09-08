@@ -4,6 +4,7 @@ namespace App\Service\Inv;
 
 use App\Exception\ServiceException;
 use App\Model\FileAttachment;
+use App\Model\FileUsage;
 use App\Model\InvBrand;
 use App\Model\InvCategory;
 use App\Model\InvItemSku;
@@ -50,6 +51,7 @@ class ItemService
             if (isset($data['brand_id']) && !InvBrand::where('merchant_id', $data['merchant_id'])->where('id', $data['brand_id'])->exists()) {
                 throw new ServiceException('品牌不存在');
             }
+            //检查图片ID是否合法
             $imageIds = array_values(array_unique($data['images'] ?? []));
             if ($imageIds) {
                 // 按你的实际所有权字段来：merchant_id / owner_type+owner_id / uploader_user_id 等
@@ -65,39 +67,42 @@ class ItemService
                 }
             }
 
-            $skus = [];
-            foreach ($data['sku'] ?? [] as $value) {
-                //查询barcode有没有被占用
-                if (InvItemSku::where('barcode', $value['barcode'])->exists()) {
-                    throw new ServiceException('条形码已存在');
-                }
-                $sku = new InvItemSku();
-                $sku->name = $value['name'];
-                $sku->barcode = $value['barcode'];
-                $sku->merchant_id = $data['merchant_id'];
-                $sku->conversion_to_base = $value['conversion_to_base'];
-                $skus[] = $sku;
-            }
+            //增加spu
             $spu = new InvItemSpu();
             $spu->merchant_id = $data['merchant_id'];
             $spu->category_id = $data['category_id'];
             $spu->brand_id = $data['brand_id'] ?? null;
             $spu->name = $data['name'];
             $spu->save();
-            $skus = $spu->sku()->saveMany($skus);
-            //sku渠道价格目录
-            foreach ($skus as $index => $temp) {
-                $skuPrices = [];
-                foreach ($data['sku'][$index]['price'] ?? [] as $temp2) {
-                    $skuPrice = new InvItemSkuPrice();
-                    $skuPrice->channel_id = $temp2['channel_id'];
-                    $skuPrice->price = $temp2['price'];
-                    $skuPrices[] = $skuPrice;
-                }
-                $temp->price()->saveMany($skuPrices);
-            }
-            //创建图片引用
 
+            //创建图片引用
+            $usages = [];
+            foreach ($imageIds as $imageId) {
+                $temp = new FileUsage();
+                $temp->attachment_id = $imageId;
+                $temp->owner_type = 'spu';
+                $temp->owner_id = $spu->id;
+                $usages[] = $temp;
+            }
+            $spu->images()->saveMany($usages);
+
+            //递归保存
+            $saveSku = function (array $row, $spu_id, $base_sku_id) use ($data, &$saveSku) {
+                $sku = new InvItemSku();
+                $sku->merchant_id = $data['merchant_id'];
+                $sku->spu_id = $spu_id;
+                $sku->base_sku_id = $base_sku_id;
+                $sku->name = $row['name'];
+                $sku->barcode = $row['barcode'] ?? null;
+                $sku->conversion_to_base = $row['conversion_to_base'] ?? 1;
+                $sku->save();
+                foreach (($row['children'] ?? []) as $childRow) {
+                    $saveSku($childRow, $spu_id, $sku->id);
+                }
+            };
+            foreach ($data['skus'] ?? [] as $skuRow) {
+                $saveSku($skuRow, $spu->id, null);
+            }
             return $spu;
         });
     }
