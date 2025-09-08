@@ -7,6 +7,7 @@ namespace App\Model;
 
 
 use Hyperf\Database\Model\Relations\BelongsTo;
+use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
  * @property string $id 
@@ -18,6 +19,9 @@ use Hyperf\Database\Model\Relations\BelongsTo;
  */
 class FileUsage extends Model
 {
+    use Snowflake;
+
+
     /**
      * The table associated with the model.
      */
