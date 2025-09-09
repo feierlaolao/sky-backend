@@ -18,7 +18,7 @@ class PurchaseOrderService
     public function purchaseOrderList($data): LengthAwarePaginatorInterface
     {
         return InvPurchaseOrder::where('merchant_id', $data['merchant_id'])
-            ->with(['items.sku.spu','channel'])
+            ->with(['items.sku.spu.images','channel'])
             ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
     }
 

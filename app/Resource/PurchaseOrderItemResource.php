@@ -21,7 +21,6 @@ class PurchaseOrderItemResource extends JsonResource
             'base_quantity' => $this->base_quantity,
             'base_unit_price' => $this->base_unit_price,
             'sku' => SkuResource::make($this->whenLoaded('sku')),
-
         ];
     }
 }
