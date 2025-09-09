@@ -305,4 +305,12 @@ class InvController extends AbstractController
         return MyResponse::page($data, $temp->currentPage(), $temp->perPage(), $temp->total())->toArray();
     }
 
+    #[GetMapping('purchase-orders/{id}')]
+    public function purchaseOrder(string $id): array
+    {
+        $data = $this->purchaseOrderService->getPurchaseOrderByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
+        $data = PurchaseOrderResource::make($data)->toArray();
+        return MyResponse::success($data)->toArray();
+    }
+
 }

@@ -7,6 +7,7 @@ use App\Model\InvChannel;
 use App\Model\InvItemSku;
 use App\Model\InvPurchaseOrder;
 use App\Model\InvPurchaseOrderItem;
+use App\Resource\PurchaseOrderResource;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\DbConnection\Db;
 use function Hyperf\Collection\collect;
@@ -20,6 +21,13 @@ class PurchaseOrderService
         return InvPurchaseOrder::where('merchant_id', $data['merchant_id'])
             ->with(['items.sku.spu.images','channel'])
             ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+    }
+
+    public function getPurchaseOrderByMerchantIdAndId($merchant,$id): PurchaseOrderResource
+    {
+        return InvPurchaseOrder::where('merchant_id',$merchant)->where('id',$id)
+            ->with(['items.sku.spu.images','channel'])
+            ->first();
     }
 
     /**
