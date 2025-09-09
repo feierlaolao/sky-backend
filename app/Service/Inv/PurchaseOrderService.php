@@ -15,10 +15,16 @@ use function Hyperf\Collection\collect;
 class PurchaseOrderService
 {
 
+    /**
+     * 1.检查sku合法性（整理合并重复sku）
+     * 2.获取单价总价，当前成本和利润
+     * 3.插入订单，减少库存
+     * @param $data
+     * @return void
+     */
     public function addPurchaseOrder($data): void
     {
         Db::transaction(function () use ($data) {
-
             $items = $data['items'];
 
             //查询渠道是否存在
@@ -36,32 +42,29 @@ class PurchaseOrderService
             $sku_ids = array_column($mergedItems, 'sku_id');
             $skus = InvItemSku::whereIn('id', $sku_ids)
                 ->where('merchant_id', $data['merchant_id'])
-                ->with(['price' => function ($query) use ($data) {
-                    $query->where('channel_id', $data['channel_id']);
-                }, 'parent', 'spu'])
+                ->with(['price', 'parent', 'spu'])
                 ->get();
-
             //判断sku_id是否存在
             $missing = array_diff($sku_ids, $skus->pluck('id')->all());
             if ($missing) {
                 throw new ServiceException('以下SKU不存在: ' . implode(',', $missing));
             }
 
-            foreach ($skus as $sku) {
-                var_dump($sku->price);
-                if (empty($sku->price)) {
-                    throw new ServiceException('SKU渠道价格不存在:' . $sku->spu->name . '-' . $sku->name);
-                }
-            }
+            $eSkus = $skus->keyBy('id')->toArray();
+            foreach ($mergedItems as $index => $item) {
+                    $nowRow = $eSkus[$item['sku_id']];
+                    if ($nowRow['base_sku_id'] == null){//是上级
 
-//            foreach ($mergedItems as $index => $item) {
+                    }else{
+
+                    }
 //                $temp = new InvPurchaseOrderItem();
 //                $temp->sku_id = $item['sku_id'];
 //                $temp->unit_price = $existsPrice[$index]['price'];
 //                $temp->total_price = $existsPrice[$index]['price'] * $item['quantity'];
-//
-//
-//            }
+
+
+            }
 
 //            $purchaseOrder = new InvPurchaseOrder();
 //            $purchaseOrder->merchant_id = $data['merchant_id'];

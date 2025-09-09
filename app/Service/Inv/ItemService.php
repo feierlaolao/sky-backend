@@ -248,6 +248,13 @@ class ItemService
         if ($channel == null) {
             throw new ServiceException('渠道不存在');
         }
+        //一个渠道只能有一个价格
+        if (InvItemSkuPrice::where('merchant_id', $data['merchant_id'])
+            ->where('sku_id', $data['sku_id'])
+            ->where('channel_id', $data['channel_id'])
+            ->exists()) {
+            throw new ServiceException('渠道价格已存在');
+        }
         $invItemSkuPrice = new InvItemSkuPrice();
         $invItemSkuPrice->merchant_id = $data['merchant_id'];
         $invItemSkuPrice->sku_id = $data['sku_id'];
