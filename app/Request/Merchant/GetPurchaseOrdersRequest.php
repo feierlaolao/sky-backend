@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Request\Merchant;
 
-use Hyperf\Validation\Request\FormRequest;
 
-class InvChannelRequest extends FormRequest
+use App\Request\PaginatedFormRequest;
+
+class GetPurchaseOrdersRequest extends PaginatedFormRequest
 {
     use BaseMerchant;
     /**
@@ -22,15 +23,16 @@ class InvChannelRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required'
-        ];
+        return array_merge(parent::rules(), [
+            'sortBy' => '',
+        ]);
     }
+
 
     public function messages(): array
     {
-        return [
-            'name.required' => '名称不能为空'
-        ];
+        return array_merge(parent::messages(), [
+
+        ]);
     }
 }

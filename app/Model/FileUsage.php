@@ -16,6 +16,7 @@ use Hyperf\Snowflake\Concern\Snowflake;
  * @property string $owner_id 
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
+ * @property-read null|FileAttachment $attachment 
  */
 class FileUsage extends Model
 {

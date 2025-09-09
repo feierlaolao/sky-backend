@@ -9,13 +9,13 @@ use Hyperf\Snowflake\Concern\Snowflake;
 use Qbhy\HyperfAuth\Authenticatable;
 
 /**
- * @property string $id
- * @property string $username
- * @property string $password
- * @property int $phone_area_code
- * @property string $phone
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property string $id 
+ * @property string $username 
+ * @property string $password 
+ * @property int $phone_area_code 
+ * @property string $phone 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
  */
 class MdUser extends Model implements Authenticatable
 {

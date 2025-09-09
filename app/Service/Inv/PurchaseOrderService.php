@@ -5,15 +5,22 @@ namespace App\Service\Inv;
 use App\Exception\ServiceException;
 use App\Model\InvChannel;
 use App\Model\InvItemSku;
-use App\Model\InvItemSkuPrice;
 use App\Model\InvPurchaseOrder;
 use App\Model\InvPurchaseOrderItem;
-use App\Request\Merchant\InvPurchaseOrderRequest;
+use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\DbConnection\Db;
 use function Hyperf\Collection\collect;
 
 class PurchaseOrderService
 {
+
+
+    public function purchaseOrderList($data): LengthAwarePaginatorInterface
+    {
+        return InvPurchaseOrder::where('merchant_id', $data['merchant_id'])
+            ->with(['items.sku.spu','channel'])
+            ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+    }
 
     /**
      * 1.检查sku合法性（整理合并重复sku）
@@ -50,28 +57,57 @@ class PurchaseOrderService
                 throw new ServiceException('以下SKU不存在: ' . implode(',', $missing));
             }
 
+            $purchaseOrder = new InvPurchaseOrder();
+            $purchaseOrder->merchant_id = $data['merchant_id'];
+            $purchaseOrder->channel_id = $data['channel_id'];
+
+            $purchaseOrderItems = [];
+            $totalAmount = 0;
+            $quantity = 0;
             $eSkus = $skus->keyBy('id')->toArray();
             foreach ($mergedItems as $index => $item) {
-                    $nowRow = $eSkus[$item['sku_id']];
-                    if ($nowRow['base_sku_id'] == null){//是上级
+                $tempItem = new InvPurchaseOrderItem();
+                $tempItem->sku_id = $item['sku_id'];
+                $tempItem->quantity = $item['quantity'];
 
-                    }else{
+                $nowSku = $eSkus[$item['sku_id']];
+                if (empty($channelPrice = array_filter($nowSku['price'], function ($temp) use ($data) {
+                    return $temp['channel_id'] == $data['channel_id'];
+                }))) {
+                    throw new ServiceException('渠道价格不存在');
+                }
+                $tempItem->unit_price = $channelPrice[0]['price'];
+                $tempItem->total_price = $channelPrice[0]['price'] * $item['quantity'];
+                $totalAmount += $channelPrice[0]['price'] * $item['quantity'];
+                $quantity += $item['quantity'];
+                $base_sku_id = $item['sku_id'];
+                if ($nowSku['base_sku_id'] == null) {//是上级
+                    $tempItem->base_quantity = $item['quantity'];
+                    $tempItem->base_unit_price = $channelPrice[0]['price'];
+                    $stock_quantity = $nowSku['stock_quantity'] + $item['quantity'];
+                    $cost_price = ($nowSku['stock_quantity'] * $nowSku['cost_price'] + $item['quantity'] * $channelPrice[0]['price']) / $stock_quantity;
 
-                    }
-//                $temp = new InvPurchaseOrderItem();
-//                $temp->sku_id = $item['sku_id'];
-//                $temp->unit_price = $existsPrice[$index]['price'];
-//                $temp->total_price = $existsPrice[$index]['price'] * $item['quantity'];
+                } else {
+                    $tempItem->base_quantity = $item['quantity'] * $nowSku['conversion_to_base'];
+                    $tempItem->base_unit_price = $channelPrice[0]['price'] / $nowSku['conversion_to_base'];
+                    $parentSku = $nowSku['parent'];
 
-
+                    $stock_quantity = $parentSku['stock_quantity'] + $item['quantity'] * $nowSku['conversion_to_base'];
+                    $cost_price = ($parentSku['stock_quantity'] * $parentSku['cost_price'] + $item['quantity'] * $channelPrice[0]['price']) / $stock_quantity;
+                    $base_sku_id = $parentSku['id'];
+                }
+                $purchaseOrderItems[] = $tempItem;
+                //改变库存和成本
+                InvItemSku::where('id', $base_sku_id)->update([
+                    'stock_quantity' => $stock_quantity,
+                    'cost_price' => $cost_price,
+                ]);
             }
 
-//            $purchaseOrder = new InvPurchaseOrder();
-//            $purchaseOrder->merchant_id = $data['merchant_id'];
-//            $purchaseOrder->channel_id = $data['channel_id'];
-//            $purchaseOrder->total_amount = 0;
-//            $purchaseOrder->save();
-
+            $purchaseOrder->total_amount = $totalAmount;
+            $purchaseOrder->quantity = $quantity;
+            $purchaseOrder->save();
+            $purchaseOrder->items()->saveMany($purchaseOrderItems);
 
         });
     }

@@ -18,11 +18,14 @@ use Hyperf\Snowflake\Concern\Snowflake;
  * @property string $base_sku_id 
  * @property int $conversion_to_base 
  * @property string $attrs 
+ * @property string $cost_price 
+ * @property int $stock_quantity 
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
  * @property-read null|InvItemSpu $spu 
  * @property-read null|\Hyperf\Database\Model\Collection|InvItemSkuPrice[] $price 
  * @property-read null|self $parent 
+ * @property-read null|\Hyperf\Database\Model\Collection|self[] $children 
  */
 class InvItemSku extends Model
 {
@@ -36,12 +39,12 @@ class InvItemSku extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'merchant_id', 'spu_id', 'name', 'barcode', 'base_sku_id', 'conversion_to_base', 'attrs', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'merchant_id', 'spu_id', 'name', 'barcode', 'base_sku_id', 'conversion_to_base', 'attrs', 'cost_price', 'stock_quantity', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['conversion_to_base' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['conversion_to_base' => 'integer', 'stock_quantity' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function spu(): BelongsTo
     {

@@ -10,16 +10,19 @@ use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
- * @property string $id
- * @property string $merchant_id
- * @property string $category_id
- * @property string $brand_id
- * @property string $name
- * @property string $description
- * @property string $attrs
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property-read null|\Hyperf\Database\Model\Collection|InvItemSku[] $sku
+ * @property string $id 
+ * @property string $merchant_id 
+ * @property string $category_id 
+ * @property string $brand_id 
+ * @property string $name 
+ * @property string $description 
+ * @property string $attrs 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property-read null|\Hyperf\Database\Model\Collection|InvItemSku[] $skus 
+ * @property-read null|InvCategory $category 
+ * @property-read null|InvBrand $brand 
+ * @property-read null|\Hyperf\Database\Model\Collection|FileUsage[] $images 
  */
 class InvItemSpu extends Model
 {

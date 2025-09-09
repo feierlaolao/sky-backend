@@ -4,6 +4,7 @@ namespace App\Service\Inv;
 
 use App\Exception\ServiceException;
 use App\Model\InvChannel;
+use App\Model\InvItemSkuPrice;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Paginator\LengthAwarePaginator;
 

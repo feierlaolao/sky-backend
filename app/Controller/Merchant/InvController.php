@@ -10,6 +10,7 @@ use App\Request\Merchant\GetBrandsRequest;
 use App\Request\Merchant\GetCategoriesRequest;
 use App\Request\Merchant\GetChannelsRequest;
 use App\Request\Merchant\GetItemsRequest;
+use App\Request\Merchant\GetPurchaseOrdersRequest;
 use App\Request\Merchant\GetSkuPricesRequest;
 use App\Request\Merchant\InvBrandRequest;
 use App\Request\Merchant\InvCategoryRequest;
@@ -22,6 +23,7 @@ use App\Resource\CategoryResource;
 use App\Resource\ChannelResource;
 use App\Resource\ItemResource;
 use App\Resource\ItemSkuPriceResource;
+use App\Resource\PurchaseOrderResource;
 use App\Service\Inv\BrandService;
 use App\Service\Inv\CategoryService;
 use App\Service\Inv\ChannelService;
@@ -292,6 +294,15 @@ class InvController extends AbstractController
         $data = $request->validatedWithMerchant();
         $this->purchaseOrderService->addPurchaseOrder($data);
         return MyResponse::success()->toArray();
+    }
+
+    #[GetMapping('purchase-orders')]
+    public function purchaseOrders(GetPurchaseOrdersRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $temp = $this->purchaseOrderService->purchaseOrderList($data);
+        $data = PurchaseOrderResource::collection($temp)->toArray();
+        return MyResponse::page($data, $temp->currentPage(), $temp->perPage(), $temp->total())->toArray();
     }
 
 }
