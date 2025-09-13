@@ -15,6 +15,7 @@ class PurchaseOrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'order_date' => $this->order_date,
             'total_amount' => $this->total_amount,
             'quantity' => $this->quantity,
             'items' => PurchaseOrderItemResource::collection($this->whenLoaded('items')),

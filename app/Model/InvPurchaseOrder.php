@@ -10,13 +10,16 @@ use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Snowflake\Concern\Snowflake;
 
 /**
- * @property string $id
- * @property string $merchant_id
- * @property string $channel_id
- * @property string $total_amount
- * @property int $quantity
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property string $id 
+ * @property string $merchant_id 
+ * @property string $channel_id 
+ * @property string $total_amount 
+ * @property int $quantity 
+ * @property string $order_date 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property-read null|\Hyperf\Database\Model\Collection|InvPurchaseOrderItem[] $items 
+ * @property-read null|InvChannel $channel 
  */
 class InvPurchaseOrder extends Model
 {
@@ -30,7 +33,7 @@ class InvPurchaseOrder extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'merchant_id', 'channel_id', 'total_amount', 'quantity', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'merchant_id', 'channel_id', 'total_amount', 'quantity', 'order_date', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.
