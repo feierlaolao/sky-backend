@@ -177,7 +177,7 @@ class ItemService
 
             $nowIds = [];
             //递归保存
-            $saveSku = function (array $row, $spu_id, $base_sku_id) use ($data, &$saveSku) {
+            $saveSku = function (array $row, $spu_id, $base_sku_id) use ($data, &$saveSku,&$nowIds) {
                 if (!empty($row['id'])) {
                     //更新
                     $sku = InvItemSku::where('id', $row['id'])->where('merchant_id', $data['merchant_id'])->where('spu_id', $spu_id)->first();

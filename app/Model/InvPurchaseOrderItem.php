@@ -33,7 +33,7 @@ class InvPurchaseOrderItem extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'order_id', 'sku_id', 'total_price', 'unit_price', 'quantity', 'base_quantity', 'base_unit_price', 'expiry_date', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'order_id', 'sku_id', 'total_price', 'unit_price', 'quantity', 'base_quantity', 'base_unit_price', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.

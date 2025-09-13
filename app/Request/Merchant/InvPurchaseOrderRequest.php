@@ -25,6 +25,7 @@ class InvPurchaseOrderRequest extends FormRequest
         return [
             'channel_id' => 'required',
             'items' => 'required|array',
+            'items.*.id' => 'string',
             'items.*.sku_id' => 'required',
             'items.*.quantity' => 'required',
         ];

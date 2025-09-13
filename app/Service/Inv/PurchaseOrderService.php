@@ -120,4 +120,49 @@ class PurchaseOrderService
     }
 
 
+    public function deletePurchaseOrder($id)
+    {
+        //删除order和item，恢复库存
+        Db::transaction(function () use ($id) {
+           $order = InvPurchaseOrder::with('items.sku')->find($id);
+           foreach ($order->items as $item) {
+               $updateSkuId = $item->sku_id;
+               if ($item->sku->base_sku_id != null){
+                   $updateSkuId = $item->base_sku_id;
+               }
+               //恢复库存
+               InvItemSku::where('id',$updateSkuId)->increment('stock_quantity',$item->base_quantity);
+               InvPurchaseOrderItem::where('order_id',$id)->delete();
+               InvPurchaseOrder::where('id', $id)->delete();
+           }
+        });
+    }
+
+    public function updatePurchaseOrder(int $id, $data)
+    {
+        //合并重复，
+        //找到 增加/修改/删除 的sku
+        //增加的进入正常流程，修改库存，修改进货价格
+        //
+        Db::transaction(function () use ($id, $data) {
+            $order = InvPurchaseOrder::with('items')->where('id', $id)->where('merchant_id',$data['merchant_id'])->first();
+            if ($order == null) {
+                throw new ServiceException('订单不存在');
+            }
+            $nowItems = $data['items'];
+            $mergedItems = collect($nowItems)->groupBy('sku_id')->map(fn($group) => [
+                'id' => $group->firstWhere('id', '!=', null)['id'] ?? null,
+                'sku_id' => $group->first()['sku_id'],
+                'quantity' => $group->sum('quantity'),
+            ])->values()->all();
+
+            foreach ($mergedItems as $index => $item) {
+
+            }
+
+        });
+    }
+
+
+
 }

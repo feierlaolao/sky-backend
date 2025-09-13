@@ -313,4 +313,55 @@ class InvController extends AbstractController
         return MyResponse::success($data)->toArray();
     }
 
+
+    #[PatchMapping('purchase-orders/{id}')]
+    public function updatePurchaseOrder(string $id, InvPurchaseOrderRequest $request): array
+    {
+
+        $data = $request->validatedWithMerchant();
+        $this->purchaseOrderService->updatePurchaseOrder($id, $data);
+        return MyResponse::success()->toArray();
+    }
+
+    #[DeleteMapping('purchase-orders/{id}')]
+    public function deletePurchaseOrder($id): array
+    {
+        $order = $this->purchaseOrderService->getPurchaseOrderByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $id);
+        if ($order == null) {
+            throw new ServiceException('订单不存在');
+        }
+        $this->purchaseOrderService->deletePurchaseOrder($id);
+        return MyResponse::success()->toArray();
+    }
+
+    #[GetMapping('sale-orders')]
+    public function saleOrders()
+    {
+
+    }
+
+    #[GetMapping('sale-orders/{id}')]
+    public function saleOrder(string $id): array
+    {
+        return MyResponse::success()->toArray();
+    }
+
+    #[PostMapping('sale-orders')]
+    public function addSaleOrder()
+    {
+
+    }
+
+    #[PatchMapping('sale-orders/{id}')]
+    public function updateSaleOrder(string $id)
+    {
+
+    }
+
+    #[DeleteMapping('sale-orders/{id}')]
+    public function deleteSaleOrder($id): array
+    {
+        return MyResponse::success()->toArray();
+    }
+
 }
