@@ -24,7 +24,9 @@ class ItemService
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
             ->when(isset($data['category_id']), fn(Builder $query) => $query->where('category_id', $data['category_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
-            ->with(['skus.price', 'skus.children', 'category', 'brand', 'images.attachment'])
+            ->with(['sku' => function (Builder $query) {
+                $query->whereNull('base_sku_id');
+            }, 'skus.price', 'skus.children', 'category', 'brand', 'images.attachment'])
             ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
     }
 
@@ -177,7 +179,7 @@ class ItemService
 
             $nowIds = [];
             //递归保存
-            $saveSku = function (array $row, $spu_id, $base_sku_id) use ($data, &$saveSku,&$nowIds) {
+            $saveSku = function (array $row, $spu_id, $base_sku_id) use ($data, &$saveSku, &$nowIds) {
                 if (!empty($row['id'])) {
                     //更新
                     $sku = InvItemSku::where('id', $row['id'])->where('merchant_id', $data['merchant_id'])->where('spu_id', $spu_id)->first();
