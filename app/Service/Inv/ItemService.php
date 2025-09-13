@@ -27,7 +27,7 @@ class ItemService
             ->with(['skus' => function ($query) {
                 $query->whereNull('base_sku_id')->with(['price', 'children']);
             }, 'category', 'brand', 'images.attachment'])
-            ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
 
@@ -238,7 +238,7 @@ class ItemService
             $query->where('channel_id', $data['channel_id']);
         })->when(isset($data['merchant_id']), function ($query) use ($data) {
             $query->where('merchant_id', $data['merchant_id']);
-        })->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+        })->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
     public function addSkuPrice($data): void

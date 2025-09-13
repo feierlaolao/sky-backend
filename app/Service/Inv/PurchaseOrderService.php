@@ -19,7 +19,7 @@ class PurchaseOrderService
     {
         return InvPurchaseOrder::where('merchant_id', $data['merchant_id'])
             ->with(['items.sku.spu.images','channel'])
-            ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
     public function getPurchaseOrderByMerchantIdAndId($merchant,$id)

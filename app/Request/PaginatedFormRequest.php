@@ -14,7 +14,7 @@ abstract class PaginatedFormRequest extends FormRequest
 
         // alias 归一化
         $all['current']  = $all['current']  ?? $all['page']      ?? 1;
-        $all['pageSize'] = $all['pageSize'] ?? $all['page_size'] ?? 20;
+        $all['page_size'] = $all['page_size'] ?? $all['page_size'] ?? 20;
 
         return $all;
     }
@@ -23,7 +23,7 @@ abstract class PaginatedFormRequest extends FormRequest
     {
         return [
             'current'  => ['sometimes','integer','min:1'],
-            'pageSize' => ['sometimes','integer','min:1','max:50'],
+            'page_size' => ['sometimes','integer','min:1','max:50'],
         ];
     }
 
@@ -31,7 +31,7 @@ abstract class PaginatedFormRequest extends FormRequest
     {
         return [
             'current'  => '页码',
-            'pageSize' => '每页数量',
+            'page_size' => '每页数量',
         ];
     }
 
@@ -40,9 +40,9 @@ abstract class PaginatedFormRequest extends FormRequest
         return [
             'current.integer'  => ':attribute 必须是整数',
             'current.min'      => ':attribute 不能小于 :min',
-            'pageSize.integer' => ':attribute 必须是整数',
-            'pageSize.min'     => ':attribute 不能小于 :min',
-            'pageSize.max'     => ':attribute 不能大于 :max',
+            'page_size.integer' => ':attribute 必须是整数',
+            'page_size.min'     => ':attribute 不能小于 :min',
+            'page_size.max'     => ':attribute 不能大于 :max',
         ];
     }
 
@@ -52,7 +52,7 @@ abstract class PaginatedFormRequest extends FormRequest
         $v = $this->validated();
         return [
             'current'  => (int)($v['current']  ?? 1),
-            'pageSize' => (int)($v['pageSize'] ?? 20),
+            'page_size' => (int)($v['page_size'] ?? 20),
         ];
     }
 }

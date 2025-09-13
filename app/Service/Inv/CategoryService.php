@@ -16,7 +16,7 @@ class CategoryService
         return InvCategory::when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
             ->orderByDesc('created_at')
-            ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
     public function addCategory($data): InvCategory

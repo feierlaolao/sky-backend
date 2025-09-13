@@ -25,7 +25,7 @@ class GetCategoriesRequest extends PaginatedFormRequest
     {
         return array_merge(parent::rules(), [
             'name' => 'string|max:64',
-            'sortBy' => 'in:created_at',
+            'sort_by' => 'in:created_at',
         ]);
     }
 

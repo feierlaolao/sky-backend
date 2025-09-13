@@ -28,7 +28,7 @@ class GetSkuPricesRequest extends PaginatedFormRequest
             'sku_id' => 'string',
             'type' => 'in:0,1',
             'channel_id' => 'string',
-            'sortBy' => 'in:created_at',
+            'sort_by' => 'in:created_at',
         ]);
     }
 

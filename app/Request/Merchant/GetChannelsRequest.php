@@ -27,7 +27,7 @@ class GetChannelsRequest extends PaginatedFormRequest
         return array_merge(parent::rules(), [
             'name' => 'string|max:64',
             'type' => 'in:0,1',
-            'sortBy' => 'in:created_at',
+            'sort_by' => 'in:created_at',
         ]);
     }
 

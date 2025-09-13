@@ -14,7 +14,7 @@ class BrandService
     {
         return InvBrand::when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
             ->orderByDesc('created_at')
-            ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
 

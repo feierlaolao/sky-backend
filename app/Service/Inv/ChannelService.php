@@ -16,7 +16,7 @@ class ChannelService
         return InvChannel::when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
             ->when(isset($data['type']), fn(Builder $query) => $query->where('type', $data['type']))
             ->orderByDesc('created_at')
-            ->paginate(perPage: $data['pageSize'] ?? 20, page: $data['current'] ?? 1);
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
 
