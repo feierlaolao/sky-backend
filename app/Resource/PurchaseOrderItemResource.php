@@ -15,7 +15,7 @@ class PurchaseOrderItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'total_amount' => $this->total_amount,
+            'total_price' => $this->total_price,
             'unit_price' => $this->unit_price,
             'quantity' => $this->quantity,
             'base_quantity' => $this->base_quantity,
