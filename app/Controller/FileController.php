@@ -62,7 +62,7 @@ class FileController
         $request = $s3Client->createPresignedRequest($cmd, '+10 minutes');
         return MyResponse::success([
             'id' => (string)$fileAttachment->id,
-            'object_url' => env('S3_ENDPOINT') . '/' . $key,
+            'object_url' => env('S3_ENDPOINT')  . $key,
             'upload_url' => $request->getUri(),
         ])->toArray();
     }

@@ -348,11 +348,8 @@ class InvController extends AbstractController
     #[PostMapping('purchase-orders/{order_id}/items')]
     public function addPurchaseOrderItems($order_id, InvPurchaseOrderItemRequest $request): array
     {
-        $order = $this->purchaseOrderService->getPurchaseOrderByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $order_id);
-        if ($order == null) {
-            throw new ServiceException('订单不存在');
-        }
-        $this->purchaseOrderService->addPurchaseOrderItem($order_id, $request->validatedWithMerchant());
+        $data = $request->validatedWithMerchant();
+        $this->purchaseOrderService->addPurchaseOrderItem($data);
         return MyResponse::success()->toArray();
     }
 

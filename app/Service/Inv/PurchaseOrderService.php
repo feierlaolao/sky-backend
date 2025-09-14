@@ -139,12 +139,18 @@ class PurchaseOrderService
     }
 
 
-    public function addPurchaseOrderItem($order_id,$data)
+    public function addPurchaseOrderItem($data)
     {
+        $order = $this->getPurchaseOrderByMerchantIdAndId($data['merchant_id'], $data['order_id']);
+        if ($order == null){
+            throw new ServiceException('订单不存在');
+        }
+
         $purchaseOrderItem = new InvPurchaseOrderItem();
-        $purchaseOrderItem->order_id = $order_id;
+        $purchaseOrderItem->order_id = $order->id;
         $purchaseOrderItem->sku_id = $data['sku_id'];
         $purchaseOrderItem->quantity = $data['quantity'];
+
     }
 
 
