@@ -67,7 +67,7 @@ class PurchaseOrderService
             $purchaseOrder = new InvPurchaseOrder();
             $purchaseOrder->merchant_id = $data['merchant_id'];
             $purchaseOrder->channel_id = $data['channel_id'];
-
+            $purchaseOrder->order_date = $data['order_date'];
             $purchaseOrderItems = [];
             $totalAmount = 0;
             $quantity = 0;
@@ -138,6 +138,13 @@ class PurchaseOrderService
         });
     }
 
+    /**
+     * 1.先找到要删除的，先删除，恢复价格
+     * 2.
+     * @param int $id
+     * @param $data
+     * @return void
+     */
     public function updatePurchaseOrder(int $id, $data)
     {
         //合并重复，
