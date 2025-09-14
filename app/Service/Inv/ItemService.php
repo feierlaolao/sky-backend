@@ -46,7 +46,14 @@ class ItemService
                         }
                     ]);
             }])
-            ->whereHas('skus')
+            ->whereHas('skus', function ($q) use ($data) {
+                $q->when(!empty($data['barcode']), fn($q2) => $q2->where('barcode', $data['barcode']))
+                    ->whereHas('prices', function ($p) use ($data) {
+                        if (!empty($data['channel_id'])) {
+                            $p->where('channel_id', $data['channel_id']);
+                        }
+                    });
+            })
             ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
