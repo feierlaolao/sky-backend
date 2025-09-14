@@ -33,12 +33,12 @@ class FileController
     public function upload(FileUploadRequest $request)
     {
         $data = $request->validated();
-        $key = '/uploads/' . md5(uniqid('', true)) . '.' . $data['extension'];
+        $key = 'uploads/' . md5(uniqid('', true)) . '.' . $data['extension'];
         $bucket = env('S3_BUCKET');
         $fileAttachment = $this->fileService->addFile([
             'bucket' => $bucket,
             'upload_user_id' => $this->auth->guard('merchant_jwt')->id(),
-            'object_key' => $key,
+            'object_key' => '/' . $key,
         ]);
         //获得s3的鉴权url
         $config = [
@@ -62,7 +62,7 @@ class FileController
         $request = $s3Client->createPresignedRequest($cmd, '+10 minutes');
         return MyResponse::success([
             'id' => (string)$fileAttachment->id,
-            'object_url' => env('S3_ENDPOINT')  . $key,
+            'object_url' => env('S3_ENDPOINT') . '/' . $key,
             'upload_url' => $request->getUri(),
         ])->toArray();
     }
