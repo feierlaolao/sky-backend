@@ -40,8 +40,8 @@ class ItemService
     public function skuList($data): LengthAwarePaginatorInterface
     {
         return InvItemSpu::query()->where('merchant_id', $data['merchant_id'])
+            ->with(['skus.price'])
             ->when(!empty($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
-            ->with('skus.price')
 //            ->whereHas('skus.price', function ($query) use ($data) {
 //                if (!empty($data['channel_id'])) {
 //                    $query->where('channel_id', $data['channel_id']);
