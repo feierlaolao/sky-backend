@@ -55,7 +55,7 @@ class IndexController extends AbstractController
     #[GetMapping('test')]
     public function test()
     {
-        $data = InvItemSpu::with(['category','brand','skus.children','images.attachment'])->paginate();
-        return ItemResource::collection($data)->toArray();
+        return InvItemSpu::with('skus.price')
+            ->paginate();
     }
 }
