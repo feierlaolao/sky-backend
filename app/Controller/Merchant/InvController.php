@@ -15,6 +15,7 @@ use App\Request\Merchant\GetSkuPricesRequest;
 use App\Request\Merchant\InvBrandRequest;
 use App\Request\Merchant\InvCategoryRequest;
 use App\Request\Merchant\InvChannelRequest;
+use App\Request\Merchant\InvPurchaseOrderItemRequest;
 use App\Request\Merchant\InvPurchaseOrderRequest;
 use App\Request\Merchant\ItemsRequest;
 use App\Request\Merchant\SkuPricesRequest;
@@ -333,6 +334,31 @@ class InvController extends AbstractController
         $this->purchaseOrderService->deletePurchaseOrder($id);
         return MyResponse::success()->toArray();
     }
+
+    #[PostMapping('purchase-orders/{order_id}/items')]
+    public function addPurchaseOrderItems($order_id, InvPurchaseOrderItemRequest $request): array
+    {
+        $order = $this->purchaseOrderService->getPurchaseOrderByMerchantIdAndId($this->authManager->guard('merchant_jwt')->id(), $order_id);
+        if ($order == null) {
+            throw new ServiceException('订单不存在');
+        }
+        $this->purchaseOrderService->addPurchaseOrderItem($order_id, $request->validatedWithMerchant());
+        return MyResponse::success()->toArray();
+    }
+
+    #[DeleteMapping('purchase-orders/{order_id}/items/{id}')]
+    public function deletePurchaseOrderItems($order_id,$id): array
+    {
+        return MyResponse::success()->toArray();
+    }
+
+    #[PatchMapping('purchase-orders/{order_id}/items/{id}')]
+    public function updatePurchaseOrderItems($order_id,$id)
+    {
+
+    }
+
+
 
     #[GetMapping('sale-orders')]
     public function saleOrders()

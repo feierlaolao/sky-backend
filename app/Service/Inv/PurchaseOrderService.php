@@ -138,36 +138,13 @@ class PurchaseOrderService
         });
     }
 
-    /**
-     * 1.先找到要删除的，先删除，恢复价格
-     * 2.
-     * @param int $id
-     * @param $data
-     * @return void
-     */
-    public function updatePurchaseOrder(int $id, $data)
+
+    public function addPurchaseOrderItem($order_id,$data)
     {
-        //合并重复，
-        //找到 增加/修改/删除 的sku
-        //增加的进入正常流程，修改库存，修改进货价格
-        //
-        Db::transaction(function () use ($id, $data) {
-            $order = InvPurchaseOrder::with('items')->where('id', $id)->where('merchant_id',$data['merchant_id'])->first();
-            if ($order == null) {
-                throw new ServiceException('订单不存在');
-            }
-            $nowItems = $data['items'];
-            $mergedItems = collect($nowItems)->groupBy('sku_id')->map(fn($group) => [
-                'id' => $group->firstWhere('id', '!=', null)['id'] ?? null,
-                'sku_id' => $group->first()['sku_id'],
-                'quantity' => $group->sum('quantity'),
-            ])->values()->all();
-
-            foreach ($mergedItems as $index => $item) {
-
-            }
-
-        });
+        $purchaseOrderItem = new InvPurchaseOrderItem();
+        $purchaseOrderItem->order_id = $order_id;
+        $purchaseOrderItem->sku_id = $data['sku_id'];
+        $purchaseOrderItem->quantity = $data['quantity'];
     }
 
 
