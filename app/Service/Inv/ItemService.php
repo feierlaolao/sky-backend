@@ -44,10 +44,10 @@ class ItemService
             ->with('skus')
             ->whereHas('skus.price', function ($query) use ($data) {
                 if (!empty($data['channel_id'])) {
-                    $query->where('channel_id', $data['channel_id']);
+                    $query->where('channel_id', $data['channel_id'])->with(['price']);
                 }
                 if (!empty($data['barcode'])) {
-                    $query->where('barcode', $data['barcode']);
+                    $query->where('barcode', $data['barcode'])->with(['price']);
                 }
             })
             ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
