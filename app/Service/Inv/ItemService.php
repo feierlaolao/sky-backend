@@ -37,16 +37,14 @@ class ItemService
         return InvItemSpu::query()->where('merchant_id', $data['merchant_id'])
             ->when(!empty($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
             ->with(['skus' => function ($query) use ($data) {
-                if (!empty($data['barcode'])){
-                    $query->where('barcode', $data['barcode']);
-                }
-                $query->whereHas('prices')->with([
-                    'prices' => function ($p) use ($data) {
-                        if (!empty($data['channel_id'])) {
-                            $p->where('channel_id', $data['channel_id']);
+                $query->when(!empty($data['barcode']), fn(Builder $query) => $query->where('barcode', $data['barcode']))
+                    ->whereHas('prices')->with([
+                        'prices' => function ($p) use ($data) {
+                            if (!empty($data['channel_id'])) {
+                                $p->where('channel_id', $data['channel_id']);
+                            }
                         }
-                    }
-                ]);
+                    ]);
             }])
             ->whereHas('skus')
             ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);

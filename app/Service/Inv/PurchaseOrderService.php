@@ -56,7 +56,7 @@ class PurchaseOrderService
             $sku_ids = array_column($mergedItems, 'sku_id');
             $skus = InvItemSku::whereIn('id', $sku_ids)
                 ->where('merchant_id', $data['merchant_id'])
-                ->with(['price', 'parent', 'spu'])
+                ->with(['prices', 'parent', 'spu'])
                 ->get();
             //判断sku_id是否存在
             $missing = array_diff($sku_ids, $skus->pluck('id')->all());
