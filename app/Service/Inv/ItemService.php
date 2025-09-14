@@ -191,13 +191,13 @@ class ItemService
             if ($toAdd) {
                 $rows = [];
                 foreach ($toAdd as $aid) {
-                    $rows[] = [
-                        'attachment_id' => $aid,
-                        'owner_type' => 'spu',
-                        'owner_id' => $spu->id,
-                    ];
+                    $tempFileUsage = new FileUsage();
+                    $tempFileUsage->attachment_id = $aid;
+                    $tempFileUsage->owner_type = 'spu';
+                    $tempFileUsage->owner_id = $spu->id;
+                    $rows[] = $tempFileUsage;
                 }
-                FileUsage::query()->insert($rows);
+                $spu->images()->saveMany($rows);
             }
 
             //查询当前所有的skuId
