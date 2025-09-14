@@ -55,7 +55,39 @@ class IndexController extends AbstractController
     #[GetMapping('test')]
     public function test()
     {
-        return InvItemSpu::with('skus.price')
+//        return InvItemSpu::with('skus.prices')
+//            ->whereHas('skus', function ($q) {
+//                $q->whereHas('prices', function ($p) {
+//                    $p->where('channel_id', '821509480440152065');
+//                });
+//            })
+//            ->with([
+//                'skus' => function ($q) {
+//                    $q->whereHas('prices', function ($p) {
+//                        $p->where('channel_id', '821509480440152065');
+//                    })->with([
+//                        'prices' => function ($p) {
+//                            $p->where('channel_id', '821509480440152065');
+//                        }
+//                    ]);
+//                },
+//                // 如需其它关联：
+//                // 'category', 'brand', 'images.attachment'
+//            ])
+//            ->paginate();
+
+        return InvItemSpu::with([
+                'skus' => function ($q) {
+                    $q->whereHas('prices')->with([
+                        'prices' => function ($p) {
+                            $p->where('channel_id', '821509480440152065');
+                        }
+                    ]);
+                },
+                // 如需其它关联：
+                // 'category', 'brand', 'images.attachment'
+            ])
+            ->whereHas('skus')
             ->paginate();
     }
 }
