@@ -20,7 +20,8 @@ class ItemService
 
     public function items($data): LengthAwarePaginatorInterface
     {
-        return InvItemSpu::query()->when(isset($data['sort_by']), fn(Builder $query) => $query->orderByDesc($data['sort_by']))
+        return InvItemSpu::query()->where('merchant_id', $data['merchant_id'])
+            ->when(isset($data['sort_by']), fn(Builder $query) => $query->orderByDesc($data['sort_by']))
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
             ->when(!empty($data['category_id']), fn(Builder $query) => $query->where('category_id', $data['category_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
@@ -35,6 +36,22 @@ class ItemService
             ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
+
+    public function skuList($data): LengthAwarePaginatorInterface
+    {
+        return InvItemSpu::query()->where('merchant_id', $data['merchant_id'])
+            ->when(!empty($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
+            ->with('skus')
+            ->whereHas('skus.price', function ($query) use ($data) {
+                if (!empty($data['channel_id'])) {
+                    $query->where('channel_id', $data['channel_id']);
+                }
+                if (!empty($data['barcode'])) {
+                    $query->where('barcode', $data['barcode']);
+                }
+            })
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
+    }
 
     public function getItemByMerchantIdAndId($merchant_id, $id)
     {

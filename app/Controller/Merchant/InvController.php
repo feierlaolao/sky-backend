@@ -12,6 +12,7 @@ use App\Request\Merchant\GetChannelsRequest;
 use App\Request\Merchant\GetItemsRequest;
 use App\Request\Merchant\GetPurchaseOrdersRequest;
 use App\Request\Merchant\GetSkuPricesRequest;
+use App\Request\Merchant\GetSkusRequest;
 use App\Request\Merchant\InvBrandRequest;
 use App\Request\Merchant\InvCategoryRequest;
 use App\Request\Merchant\InvChannelRequest;
@@ -245,6 +246,15 @@ class InvController extends AbstractController
     }
 
 
+    #[GetMapping('skus')]
+    public function skus(GetSkusRequest $request): array
+    {
+        $data = $request->validatedWithMerchant();
+        $temp = $this->itemService->skuList($data);
+        $res = ItemResource::collection($temp);
+        return MyResponse::page($res, $temp->currentPage(), $temp->perPage(), $temp->total())->toArray();
+    }
+
     #[GetMapping('sku-prices')]
     public function skuPrices(GetSkuPricesRequest $request): array
     {
@@ -347,17 +357,16 @@ class InvController extends AbstractController
     }
 
     #[DeleteMapping('purchase-orders/{order_id}/items/{id}')]
-    public function deletePurchaseOrderItems($order_id,$id): array
+    public function deletePurchaseOrderItems($order_id, $id): array
     {
         return MyResponse::success()->toArray();
     }
 
     #[PatchMapping('purchase-orders/{order_id}/items/{id}')]
-    public function updatePurchaseOrderItems($order_id,$id)
+    public function updatePurchaseOrderItems($order_id, $id)
     {
 
     }
-
 
 
     #[GetMapping('sale-orders')]
