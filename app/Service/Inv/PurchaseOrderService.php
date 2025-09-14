@@ -78,7 +78,7 @@ class PurchaseOrderService
                 $tempItem->quantity = $item['quantity'];
 
                 $nowSku = $eSkus[$item['sku_id']];
-                if (empty($channelPrice = array_filter($nowSku['price'], function ($temp) use ($data) {
+                if (empty($channelPrice = array_filter($nowSku['prices'], function ($temp) use ($data) {
                     return $temp['channel_id'] == $data['channel_id'];
                 }))) {
                     throw new ServiceException('渠道价格不存在');
