@@ -51,7 +51,7 @@ class InvItemSku extends Model
         return $this->belongsTo(InvItemSpu::class, 'spu_id', 'id');
     }
 
-    public function price(): HasMany
+    public function prices(): HasMany
     {
         return $this->hasMany(InvItemSkuPrice::class, 'sku_id', 'id');
     }

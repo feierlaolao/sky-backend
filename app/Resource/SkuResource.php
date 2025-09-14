@@ -24,6 +24,7 @@ class SkuResource extends JsonResource
             'stock_quantity' => $this->stock_quantity,
             'spu' => ItemResource::make($this->whenLoaded('spu')),
             'children' => SkuResource::collection($this->whenLoaded('children')),
+            'prices' => ItemSkuPriceResource::collection($this->whenLoaded('prices')),
         ];
     }
 }

@@ -26,9 +26,18 @@ class ItemService
             ->when(!empty($data['category_id']), fn(Builder $query) => $query->where('category_id', $data['category_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
             ->with(['skus' => function ($query) {
-                $query->whereNull('base_sku_id')->with(['price', 'children']);
+                $query->whereNull('base_sku_id')->with(['prices', 'children']);
             }, 'category', 'brand', 'images.attachment'])
-            ->whereHas('skus.price', function ($query) use ($data) {
+            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
+    }
+
+
+    public function skuList($data): LengthAwarePaginatorInterface
+    {
+        return InvItemSpu::query()->where('merchant_id', $data['merchant_id'])
+            ->when(!empty($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
+            ->with('skus.prices')
+            ->whereHas('skus.prices', function ($query) use ($data) {
                 if (!empty($data['channel_id'])) {
                     $query->where('channel_id', $data['channel_id']);
                 }
@@ -36,24 +45,11 @@ class ItemService
             ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
     }
 
-
-    public function skuList($data): LengthAwarePaginatorInterface
-    {
-        return InvItemSpu::with(['skus.price'])
-//            ->when(!empty($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
-//            ->whereHas('skus.price', function ($query) use ($data) {
-//                if (!empty($data['channel_id'])) {
-//                    $query->where('channel_id', $data['channel_id']);
-//                }
-//            })
-            ->paginate(perPage: $data['page_size'] ?? 20, page: $data['current'] ?? 1);
-    }
-
     public function getItemByMerchantIdAndId($merchant_id, $id)
     {
         return InvItemSpu::where('id', $id)
             ->where('merchant_id', $merchant_id)
-            ->with(['skus.price', 'skus.children', 'category', 'brand', 'images.attachment'])
+            ->with(['skus.prices', 'skus.children', 'category', 'brand', 'images.attachment'])
             ->first();
     }
 
@@ -315,7 +311,7 @@ class ItemService
     public function getSkuByBarCode(string $barcode)
     {
         return InvItemSku::where('barcode', $barcode)
-            ->with('spu', 'price')
+            ->with('spu', 'prices')
             ->first();
     }
 
