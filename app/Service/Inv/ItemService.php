@@ -20,7 +20,7 @@ class ItemService
 
     public function items($data): LengthAwarePaginatorInterface
     {
-        return InvItemSpu::query()->when(isset($data['sort_by']), fn(Builder $query) => $query->orderByDesc($data['sortBy']))
+        return InvItemSpu::query()->when(isset($data['sort_by']), fn(Builder $query) => $query->orderByDesc($data['sort_by']))
             ->when(isset($data['merchant_id']), fn(Builder $query) => $query->where('merchant_id', $data['merchant_id']))
             ->when(!empty($data['category_id']), fn(Builder $query) => $query->where('category_id', $data['category_id']))
             ->when(isset($data['name']), fn(Builder $query) => $query->where('name', 'like', '%' . $data['name'] . '%'))
