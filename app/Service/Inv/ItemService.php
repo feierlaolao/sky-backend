@@ -27,7 +27,7 @@ class ItemService
             ->with(['skus' => function ($query) {
                 $query->whereNull('base_sku_id')->with(['price', 'children']);
             }, 'category', 'brand', 'images.attachment'])
-            ->whereHas('skus.price', function ($query) {
+            ->whereHas('skus.price', function ($query) use ($data) {
                 if (!empty($data['channel_id'])) {
                     $query->where('channel_id', $data['channel_id']);
                 }
